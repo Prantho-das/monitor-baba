@@ -155,6 +155,11 @@ export default function ServerDetailPage({
   if (!server) return null;
 
   const currentMetrics = metrics[0] || { cpu_percent: 0, ram_percent: 0, disk_percent: 0, uptime_seconds: 0 };
+  
+  let parsedServices = currentMetrics.services;
+  if (typeof parsedServices === 'string') {
+    try { parsedServices = JSON.parse(parsedServices); } catch(e) {}
+  }
 
   return (
     <>
@@ -252,13 +257,13 @@ export default function ServerDetailPage({
         </div>
 
         {/* Running Services */}
-        {currentMetrics.services?.daemons && (
+        {parsedServices?.daemons && (
           <>
             <div style={styles.sectionTitle}>
               <h3>Running Services</h3>
             </div>
             <div className="glass-card" style={styles.servicesContainer}>
-              {Object.entries(currentMetrics.services.daemons).map(([key, isRunning]) => (
+              {Object.entries(parsedServices.daemons).map(([key, isRunning]) => (
                 <div key={key} className={`service-badge ${isRunning ? 'active' : 'inactive'}`} style={styles.largeBadge}>
                   <span className="dot" style={styles.largeDot} />
                   {key}
@@ -269,7 +274,7 @@ export default function ServerDetailPage({
         )}
 
         {/* Server Logs Terminal */}
-        {currentMetrics.services?.logs && (
+        {parsedServices?.logs && (
           <>
             <div style={styles.sectionTitle}>
               <h3>Server Logs (Live)</h3>
@@ -281,7 +286,7 @@ export default function ServerDetailPage({
                 <span>Bash</span>
               </div>
               <div className="terminal-viewer">
-                {currentMetrics.services.logs.sys || 'Waiting for logs...'}
+                {parsedServices.logs.sys || 'Waiting for logs...'}
               </div>
             </div>
 
@@ -291,7 +296,7 @@ export default function ServerDetailPage({
                 <span>Bash</span>
               </div>
               <div className="terminal-viewer">
-                {currentMetrics.services.logs.nginx || 'Waiting for logs...'}
+                {parsedServices.logs.nginx || 'Waiting for logs...'}
               </div>
             </div>
           </>

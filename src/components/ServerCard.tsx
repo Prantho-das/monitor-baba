@@ -51,8 +51,15 @@ export default function ServerCard({
   };
 
   const syncText = calculateLastSeenText(server.last_seen);
-  const loadAvg = latestMetrics?.services?.loadAvg;
-  const processCount = latestMetrics?.services?.processes;
+  
+  let services = latestMetrics?.services;
+  if (typeof services === 'string') {
+    try { services = JSON.parse(services); } catch (e) {}
+  }
+
+  const loadAvg = services?.loadAvg;
+  const processCount = services?.processes;
+  const daemons = services?.daemons;
 
   return (
     <Link href={`/servers/${server.id}`} className="glass-card" style={styles.card}>
@@ -111,9 +118,9 @@ export default function ServerCard({
         </div>
       </div>
 
-      {latestMetrics?.services?.daemons && Object.keys(latestMetrics.services.daemons).length > 0 && (
+      {daemons && Object.keys(daemons).length > 0 && (
         <div style={styles.servicesRow}>
-          {Object.entries(latestMetrics.services.daemons).map(([key, isRunning]) => (
+          {Object.entries(daemons).map(([key, isRunning]) => (
             <span key={key} className={`service-badge ${isRunning ? 'active' : 'inactive'}`} title={key}>
               <span className="dot" /> {key.substring(0, 4)}
             </span>
