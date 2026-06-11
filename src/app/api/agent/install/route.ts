@@ -95,6 +95,9 @@ function getDiskUsage() {
         resolve(pct);
       });
     }
+  });
+}
+
 function getProcessCount() {
   return new Promise((resolve) => {
     const isWin = os.platform() === 'win32';
