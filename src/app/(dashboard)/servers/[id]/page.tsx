@@ -27,7 +27,7 @@ interface MetricPoint {
   ram_percent: number;
   disk_percent: number;
   uptime_seconds: number;
-  services?: string | any[];
+  services?: any;
 }
 
 export default function ServerDetailPage({

@@ -17,11 +17,7 @@ interface ServerMetrics {
   cpu_percent: number;
   ram_percent: number;
   disk_percent: number;
-  services?: {
-    loadAvg?: number[];
-    processes?: number;
-    agentRunning?: boolean;
-  };
+  services?: any;
 }
 
 export default function ServerCard({
