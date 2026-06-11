@@ -321,7 +321,7 @@ function autoUpdate(latestVersion) {
 }
 
 // Start interval loop
-console.log(`Mooonitooor monitoring agent v${AGENT_VERSION} successfully started.`);
+console.log(`Monitor-Baba monitoring agent v${AGENT_VERSION} successfully started.`);
 console.log('Reporting target:', config.serverUrl);
 reportMetrics();
 setInterval(reportMetrics, 60000);
