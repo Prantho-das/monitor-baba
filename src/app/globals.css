@@ -6,6 +6,7 @@
   /* Light Theme */
   --bg-main: #f4f5f7;
   --bg-sidebar: #ffffff;
+  --bg-sidebar-rgb: 255, 255, 255;
   --bg-card: #ffffff;
   --bg-card-hover: #f9fafb;
   --bg-muted: #f3f4f6;
@@ -42,6 +43,7 @@
 [data-theme='dark'] {
   --bg-main: #0b0f19;
   --bg-sidebar: #111827;
+  --bg-sidebar-rgb: 17, 24, 39;
   --bg-card: #1f2937;
   --bg-card-hover: #374151;
   --bg-muted: #111827;
@@ -495,8 +497,9 @@ a {
     border-right: none;
     border-top: 1px solid var(--border-glass);
     z-index: 1000;
-    background: rgba(var(--bg-sidebar-rgb, 255, 255, 255), 0.9);
-    backdrop-filter: blur(10px);
+    background: rgba(var(--bg-sidebar-rgb), 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
   
   .sidebar-brand, .sidebar-footer {
