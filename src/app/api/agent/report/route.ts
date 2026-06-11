@@ -210,9 +210,9 @@ export async function POST(request: Request) {
           }
         }
       }
-    }
-
-    return NextResponse.json({ success: true });
+    // 6. Return successful response with latest version
+    const CURRENT_AGENT_VERSION = "1.1.0";
+    return NextResponse.json({ success: true, latestVersion: CURRENT_AGENT_VERSION });
   } catch (err: any) {
     console.error('Error in agent reporting route:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });

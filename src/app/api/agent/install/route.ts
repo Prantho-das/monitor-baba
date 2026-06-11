@@ -16,6 +16,8 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 
+const AGENT_VERSION = "1.1.0";
+
 // Load settings
 const configPath = path.join(__dirname, 'config.json');
 let config = { apiKey: '', serverUrl: 'http://localhost:3000' };
@@ -121,31 +123,65 @@ function detectServices() {
     const exec = require('child_process').exec;
     
     const servicesToCheck = [
-      { name: 'php', cmd: isWin ? 'php-cgi.exe' : 'php-fpm' },
+      { name: 'php', cmd: isWin ? 'php-cgi.exe' : 'php' },
       { name: 'mysql', cmd: isWin ? 'mysqld.exe' : 'mysqld' },
       { name: 'postgres', cmd: isWin ? 'postgres.exe' : 'postgres' },
       { name: 'node', cmd: isWin ? 'node.exe' : 'node' },
       { name: 'nginx', cmd: isWin ? 'nginx.exe' : 'nginx' },
-      { name: 'apache', cmd: isWin ? 'httpd.exe' : 'apache2' },
+      { name: 'apache', cmd: isWin ? 'httpd.exe' : 'apache' },
       { name: 'cron', cmd: isWin ? 'svchost.exe' : 'cron' },
       { name: 'supervisor', cmd: isWin ? 'supervisord.exe' : 'supervisord' },
       { name: 'redis', cmd: isWin ? 'redis-server.exe' : 'redis-server' },
       { name: 'docker', cmd: isWin ? 'dockerd.exe' : 'dockerd' },
     ];
 
-    const cmd = isWin ? 'tasklist' : 'ps -A';
-    exec(cmd, (err, stdout) => {
-      const running = {};
-      const out = stdout ? stdout.toLowerCase() : '';
-      servicesToCheck.forEach(s => {
-        if (s.name === 'apache' && !isWin) {
-          running[s.name] = out.includes('apache2') || out.includes('httpd');
-        } else {
-          running[s.name] = out.includes(s.cmd.toLowerCase());
-        }
+    if (isWin) {
+      exec('tasklist', (err, stdout) => {
+        const running = {};
+        const out = stdout ? stdout.toLowerCase() : '';
+        servicesToCheck.forEach(s => {
+          running[s.name] = {
+            running: out.includes(s.cmd.toLowerCase()),
+            cpu: 0,
+            mem: 0
+          };
+        });
+        resolve(running);
       });
-      resolve(running);
-    });
+    } else {
+      exec('ps -eo comm,%cpu,%mem --no-headers', (err, stdout) => {
+        const running = {};
+        servicesToCheck.forEach(s => running[s.name] = { running: false, cpu: 0, mem: 0 });
+        
+        if (stdout) {
+          const lines = stdout.trim().split('\\n');
+          lines.forEach(line => {
+            const parts = line.trim().split(/\\s+/);
+            if (parts.length >= 3) {
+              const comm = parts[0].toLowerCase();
+              const cpu = parseFloat(parts[1]) || 0;
+              const mem = parseFloat(parts[2]) || 0;
+              
+              servicesToCheck.forEach(s => {
+                const match = s.name === 'apache' ? (comm.includes('apache2') || comm.includes('httpd')) : comm.includes(s.cmd);
+                if (match) {
+                  running[s.name].running = true;
+                  running[s.name].cpu += cpu;
+                  running[s.name].mem += mem;
+                }
+              });
+            }
+          });
+        }
+        
+        Object.keys(running).forEach(k => {
+          running[k].cpu = Number(running[k].cpu.toFixed(1));
+          running[k].mem = Number(running[k].mem.toFixed(1));
+        });
+        
+        resolve(running);
+      });
+    }
   });
 }
 
@@ -190,6 +226,7 @@ async function collectMetrics() {
 
   return {
     apiKey: config.apiKey,
+    agentVersion: AGENT_VERSION,
     cpuPercent,
     ramPercent,
     diskPercent,
@@ -248,6 +285,12 @@ async function reportMetrics() {
       res.on('end', () => {
         if (res.statusCode === 200) {
           console.log(\`[\${new Date().toLocaleTimeString()}] Metrics sent successfully.\`);
+          try {
+            const resData = JSON.parse(data);
+            if (resData.latestVersion && resData.latestVersion !== AGENT_VERSION) {
+              autoUpdate(resData.latestVersion);
+            }
+          } catch (e) {}
         } else {
           console.warn(\`[\${new Date().toLocaleTimeString()}] API responded with status \${res.statusCode}: \${data}\`);
         }
@@ -265,8 +308,32 @@ async function reportMetrics() {
   }
 }
 
+// Function to handle self-update
+function autoUpdate(latestVersion) {
+  const isWin = os.platform() === 'win32';
+  if (isWin) {
+    console.warn(\`[Update] Version \${latestVersion} available. Please update Windows agent manually.\`);
+    return;
+  }
+  
+  console.log(\`\\n[UPDATE] New version v\${latestVersion} detected! Initiating auto-update...\`);
+  const exec = require('child_process').exec;
+  
+  // Use the one-liner installer. It overwrites monitor-agent.js and restarts the daemon!
+  const cmd = \`curl -fsSL \${config.serverUrl}/api/agent/install | bash -s -- \${config.apiKey}\`;
+  
+  exec(cmd, (err, stdout, stderr) => {
+    if (err) {
+      console.error('[UPDATE ERROR] Failed to auto-update:', err.message);
+      return;
+    }
+    console.log('[UPDATE SUCCESS] Agent updated. Restarting...');
+    process.exit(0); // Systemd will automatically restart the process
+  });
+}
+
 // Start interval loop
-console.log('Mooonitooor monitoring agent successfully started.');
+console.log(\`Mooonitooor monitoring agent v\${AGENT_VERSION} successfully started.\`);
 console.log('Reporting target:', config.serverUrl);
 reportMetrics();
 setInterval(reportMetrics, 60000);

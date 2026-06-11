@@ -4,6 +4,8 @@ const os = require('os');
 const fs = require('fs');
 const path = require('path');
 
+const AGENT_VERSION = "1.1.0";
+
 // Load settings
 const configPath = path.join(__dirname, 'config.json');
 let config = { apiKey: '', serverUrl: 'http://localhost:3000' };
@@ -212,6 +214,7 @@ async function collectMetrics() {
 
   return {
     apiKey: config.apiKey,
+    agentVersion: AGENT_VERSION,
     cpuPercent,
     ramPercent,
     diskPercent,
@@ -270,6 +273,12 @@ async function reportMetrics() {
       res.on('end', () => {
         if (res.statusCode === 200) {
           console.log(`[${new Date().toLocaleTimeString()}] Metrics sent successfully.`);
+          try {
+            const resData = JSON.parse(data);
+            if (resData.latestVersion && resData.latestVersion !== AGENT_VERSION) {
+              autoUpdate(resData.latestVersion);
+            }
+          } catch (e) {}
         } else {
           console.warn(`[${new Date().toLocaleTimeString()}] API responded with status ${res.statusCode}: ${data}`);
         }
@@ -287,8 +296,32 @@ async function reportMetrics() {
   }
 }
 
+// Function to handle self-update
+function autoUpdate(latestVersion) {
+  const isWin = os.platform() === 'win32';
+  if (isWin) {
+    console.warn(`[Update] Version ${latestVersion} available. Please update Windows agent manually.`);
+    return;
+  }
+  
+  console.log(`\n[UPDATE] New version v${latestVersion} detected! Initiating auto-update...`);
+  const exec = require('child_process').exec;
+  
+  // Use the one-liner installer. It overwrites monitor-agent.js and restarts the daemon!
+  const cmd = `curl -fsSL ${config.serverUrl}/api/agent/install | bash -s -- ${config.apiKey}`;
+  
+  exec(cmd, (err, stdout, stderr) => {
+    if (err) {
+      console.error('[UPDATE ERROR] Failed to auto-update:', err.message);
+      return;
+    }
+    console.log('[UPDATE SUCCESS] Agent updated. Restarting...');
+    process.exit(0); // Systemd will automatically restart the process
+  });
+}
+
 // Start interval loop
-console.log('Mooonitooor monitoring agent successfully started.');
+console.log(`Mooonitooor monitoring agent v${AGENT_VERSION} successfully started.`);
 console.log('Reporting target:', config.serverUrl);
 reportMetrics();
 setInterval(reportMetrics, 60000);
