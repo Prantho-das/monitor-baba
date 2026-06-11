@@ -3,6 +3,33 @@
 :root {
   --font-inter: 'Inter', sans-serif;
   
+  /* Light Theme */
+  --bg-main: #f8f9fa;
+  --bg-sidebar: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f1f3f5;
+  --border-glass: #e9ecef;
+  --border-glass-hover: #dee2e6;
+  
+  --accent-cyan: #0070f3;
+  --accent-cyan-rgb: 0, 112, 243;
+  --accent-violet: #7928ca;
+  --accent-violet-rgb: 121, 40, 202;
+  
+  --color-online: #00e676;
+  --color-warning: #f5a623;
+  --color-critical: #e00;
+  
+  --text-primary: #11181c;
+  --text-secondary: #687076;
+  --text-muted: #889096;
+  
+  --glow-cyan: 0 4px 14px 0 rgba(0, 118, 255, 0.15);
+  --glow-violet: 0 4px 14px 0 rgba(121, 40, 202, 0.15);
+  --glow-critical: 0 4px 14px 0 rgba(224, 0, 0, 0.15);
+}
+
+[data-theme='dark'] {
   --bg-main: #03030f;
   --bg-sidebar: #060617;
   --bg-card: rgba(255, 255, 255, 0.03);
@@ -10,23 +37,19 @@
   --border-glass: rgba(255, 255, 255, 0.05);
   --border-glass-hover: rgba(255, 255, 255, 0.12);
   
-  /* Neon Accents */
   --accent-cyan: #00f2fe;
   --accent-cyan-rgb: 0, 242, 254;
   --accent-violet: #8e2de2;
   --accent-violet-rgb: 142, 45, 226;
   
-  /* Status Colors */
   --color-online: #00e676;
   --color-warning: #ffb347;
   --color-critical: #ff4b2b;
   
-  /* Typography */
   --text-primary: #f8f9fa;
   --text-secondary: #8b8ea9;
   --text-muted: #53566e;
   
-  /* Shadows & Glows */
   --glow-cyan: 0 0 15px rgba(0, 242, 254, 0.25);
   --glow-violet: 0 0 15px rgba(142, 45, 226, 0.25);
   --glow-critical: 0 0 15px rgba(255, 75, 43, 0.25);

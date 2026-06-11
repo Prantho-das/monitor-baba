@@ -36,7 +36,13 @@ export default function TopBar({ title }: { title: string }) {
     }
   };
 
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+
   useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    setTheme(savedTheme as 'light' | 'dark');
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    
     fetchUnreadAlerts();
 
     // Listen for real-time insert of new alerts
@@ -67,6 +73,13 @@ export default function TopBar({ title }: { title: string }) {
     };
   }, []);
 
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+  };
+
   const markAllRead = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
@@ -91,6 +104,14 @@ export default function TopBar({ title }: { title: string }) {
       <h2 style={styles.title}>{title}</h2>
 
       <div style={styles.actions} ref={dropdownRef}>
+        <button
+          onClick={toggleTheme}
+          style={styles.themeBtn}
+          title="Toggle Theme"
+        >
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
+
         <div style={styles.notificationWrapper}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -191,6 +212,18 @@ const styles = {
     fontSize: '20px',
     cursor: 'pointer',
     position: 'relative' as const,
+    color: 'var(--text-primary)',
+    padding: '6px',
+    borderRadius: '8px',
+    transition: 'background 0.2s',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  themeBtn: {
+    background: 'transparent',
+    border: 'none',
+    fontSize: '20px',
+    cursor: 'pointer',
     color: 'var(--text-primary)',
     padding: '6px',
     borderRadius: '8px',

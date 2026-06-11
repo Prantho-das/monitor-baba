@@ -86,6 +86,23 @@ function getDiskUsage() {
   });
 }
 
+function getProcessCount() {
+  return new Promise((resolve) => {
+    const isWin = os.platform() === 'win32';
+    const exec = require('child_process').exec;
+    
+    if (isWin) {
+      exec('tasklist | find /c /v ""', (err, stdout) => {
+        resolve(parseInt(stdout.trim()) || 0);
+      });
+    } else {
+      exec('ps -A --no-headers | wc -l', (err, stdout) => {
+        resolve(parseInt(stdout.trim()) || 0);
+      });
+    }
+  });
+}
+
 // Collect all server metrics
 async function collectMetrics() {
   const totalMem = os.totalmem();
@@ -94,6 +111,7 @@ async function collectMetrics() {
 
   const cpuPercent = await getCpuUsage();
   const diskPercent = await getDiskUsage();
+  const processCount = await getProcessCount();
 
   return {
     apiKey: config.apiKey,
@@ -106,7 +124,11 @@ async function collectMetrics() {
     osInfo: `${os.type()} ${os.release()} (${os.arch()})`,
     hostname: os.hostname(),
     ipAddress: getIpAddress(),
-    services: getRunningServicesSummary(),
+    services: {
+      loadAvg: os.loadavg().map(n => Number(n.toFixed(2))),
+      processes: processCount,
+      agentRunning: true
+    },
   };
 }
 
@@ -120,13 +142,6 @@ function getIpAddress() {
     }
   }
   return '127.0.0.1';
-}
-
-function getRunningServicesSummary() {
-  return [
-    { name: 'Node.js', status: 'running' },
-    { name: 'OS Platform', status: os.platform() }
-  ];
 }
 
 // Post reporting payload to Server
