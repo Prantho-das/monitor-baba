@@ -206,6 +206,7 @@ export async function POST(request: Request) {
                 .from('alerts')
                 .update({ notification_sent: true })
                 .eq('id', offlineAlert.id);
+            }
           }
         }
       }
