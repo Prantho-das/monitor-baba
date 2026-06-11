@@ -4,11 +4,8 @@ import { createServerClient } from '@/lib/supabase/server';
 export async function proxy(request: NextRequest) {
   const response = NextResponse.next();
   
-  // Initialize Supabase Server Client
-  const supabase = createServerClient();
-
-  // Get current user session
-  const { data: { session } } = await supabase.auth.getSession();
+  // Check if there is a supabase auth token in cookies
+  const hasAuthCookie = request.cookies.getAll().some(c => c.name.startsWith('sb-') && c.name.endsWith('-auth-token'));
 
   const path = request.nextUrl.pathname;
 
@@ -22,12 +19,12 @@ export async function proxy(request: NextRequest) {
   // Paths that are only for unauthenticated users (login/signup)
   const isAuthPath = path.startsWith('/login') || path.startsWith('/signup');
 
-  if (isProtectedPath && !session) {
+  if (isProtectedPath && !hasAuthCookie) {
     // Redirect to login if user tries to access dashboard when unauthenticated
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  if (isAuthPath && session) {
+  if (isAuthPath && hasAuthCookie) {
     // Redirect to dashboard if authenticated user tries to open login/signup
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
