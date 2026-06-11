@@ -251,6 +251,52 @@ export default function ServerDetailPage({
           />
         </div>
 
+        {/* Running Services */}
+        {currentMetrics.services?.daemons && (
+          <>
+            <div style={styles.sectionTitle}>
+              <h3>Running Services</h3>
+            </div>
+            <div className="glass-card" style={styles.servicesContainer}>
+              {Object.entries(currentMetrics.services.daemons).map(([key, isRunning]) => (
+                <div key={key} className={`service-badge ${isRunning ? 'active' : 'inactive'}`} style={styles.largeBadge}>
+                  <span className="dot" style={styles.largeDot} />
+                  {key}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Server Logs Terminal */}
+        {currentMetrics.services?.logs && (
+          <>
+            <div style={styles.sectionTitle}>
+              <h3>Server Logs (Live)</h3>
+            </div>
+            
+            <div style={{ marginBottom: '24px' }}>
+              <div className="terminal-header">
+                <span>syslog (/var/log/syslog)</span>
+                <span>Bash</span>
+              </div>
+              <div className="terminal-viewer">
+                {currentMetrics.services.logs.sys || 'Waiting for logs...'}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '32px' }}>
+              <div className="terminal-header">
+                <span>nginx (/var/log/nginx/error.log)</span>
+                <span>Bash</span>
+              </div>
+              <div className="terminal-viewer">
+                {currentMetrics.services.logs.nginx || 'Waiting for logs...'}
+              </div>
+            </div>
+          </>
+        )}
+
         {/* Installation details box */}
         <div style={styles.installationWrapper}>
           <AgentInstaller apiKey={server.api_key} />
@@ -323,6 +369,22 @@ const styles = {
     gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
     gap: '24px',
     marginBottom: '32px',
+  },
+  servicesContainer: {
+    display: 'flex',
+    flexWrap: 'wrap' as const,
+    gap: '12px',
+    padding: '24px',
+    marginBottom: '32px',
+  },
+  largeBadge: {
+    padding: '8px 16px',
+    fontSize: '13px',
+    borderRadius: '16px',
+  },
+  largeDot: {
+    width: '8px',
+    height: '8px',
   },
   installationWrapper: {
     marginTop: '16px',

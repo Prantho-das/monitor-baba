@@ -83,9 +83,6 @@ function getDiskUsage() {
         resolve(pct);
       });
     }
-  });
-}
-
 function getProcessCount() {
   return new Promise((resolve) => {
     const isWin = os.platform() === 'win32';
@@ -103,6 +100,67 @@ function getProcessCount() {
   });
 }
 
+function detectServices() {
+  return new Promise((resolve) => {
+    const isWin = os.platform() === 'win32';
+    const exec = require('child_process').exec;
+    
+    const servicesToCheck = [
+      { name: 'php', cmd: isWin ? 'php-cgi.exe' : 'php-fpm' },
+      { name: 'mysql', cmd: isWin ? 'mysqld.exe' : 'mysqld' },
+      { name: 'postgres', cmd: isWin ? 'postgres.exe' : 'postgres' },
+      { name: 'node', cmd: isWin ? 'node.exe' : 'node' },
+      { name: 'nginx', cmd: isWin ? 'nginx.exe' : 'nginx' },
+      { name: 'apache', cmd: isWin ? 'httpd.exe' : 'apache2' },
+      { name: 'cron', cmd: isWin ? 'svchost.exe' : 'cron' },
+      { name: 'supervisor', cmd: isWin ? 'supervisord.exe' : 'supervisord' },
+      { name: 'redis', cmd: isWin ? 'redis-server.exe' : 'redis-server' },
+      { name: 'docker', cmd: isWin ? 'dockerd.exe' : 'dockerd' },
+    ];
+
+    const cmd = isWin ? 'tasklist' : 'ps -A';
+    exec(cmd, (err, stdout) => {
+      const running = {};
+      const out = stdout ? stdout.toLowerCase() : '';
+      servicesToCheck.forEach(s => {
+        if (s.name === 'apache' && !isWin) {
+          running[s.name] = out.includes('apache2') || out.includes('httpd');
+        } else {
+          running[s.name] = out.includes(s.cmd.toLowerCase());
+        }
+      });
+      resolve(running);
+    });
+  });
+}
+
+function tailLogs() {
+  return new Promise((resolve) => {
+    const isWin = os.platform() === 'win32';
+    const exec = require('child_process').exec;
+    const logs = { nginx: '', sys: '' };
+
+    if (isWin) {
+      resolve(logs);
+    } else {
+      let doneCount = 0;
+      const checkDone = () => { if (++doneCount === 2) resolve(logs); };
+
+      exec('tail -n 15 /var/log/nginx/error.log 2>/dev/null', (err, stdout) => {
+        if (!err && stdout) logs.nginx = stdout.trim();
+        else logs.nginx = '[No Nginx error log found or permission denied]';
+        checkDone();
+      });
+
+      exec('tail -n 15 /var/log/syslog 2>/dev/null', (err, stdout) => {
+        if (!err && stdout) logs.sys = stdout.trim();
+        else logs.sys = '[No syslog found or permission denied]';
+        checkDone();
+      });
+    }
+  });
+}
+
 // Collect all server metrics
 async function collectMetrics() {
   const totalMem = os.totalmem();
@@ -112,6 +170,8 @@ async function collectMetrics() {
   const cpuPercent = await getCpuUsage();
   const diskPercent = await getDiskUsage();
   const processCount = await getProcessCount();
+  const daemons = await detectServices();
+  const serverLogs = await tailLogs();
 
   return {
     apiKey: config.apiKey,
@@ -127,7 +187,9 @@ async function collectMetrics() {
     services: {
       loadAvg: os.loadavg().map(n => Number(n.toFixed(2))),
       processes: processCount,
-      agentRunning: true
+      agentRunning: true,
+      daemons,
+      logs: serverLogs
     },
   };
 }

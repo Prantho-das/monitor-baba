@@ -115,6 +115,16 @@ export default function ServerCard({
         </div>
       </div>
 
+      {latestMetrics?.services?.daemons && Object.keys(latestMetrics.services.daemons).length > 0 && (
+        <div style={styles.servicesRow}>
+          {Object.entries(latestMetrics.services.daemons).map(([key, isRunning]) => (
+            <span key={key} className={`service-badge ${isRunning ? 'active' : 'inactive'}`} title={key}>
+              <span className="dot" /> {key.substring(0, 4)}
+            </span>
+          ))}
+        </div>
+      )}
+
       <div style={styles.devopsBar}>
         <div style={styles.devopsItem}>
           <span style={styles.devopsLabel}>Load (1m, 5m, 15m)</span>
@@ -140,6 +150,7 @@ const styles = {
     cursor: 'pointer',
     textDecoration: 'none',
     padding: '16px', // Compact padding
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
   },
   header: {
     display: 'flex',
@@ -188,6 +199,15 @@ const styles = {
   },
   gaugeWrapper: {
     transform: 'scale(0.85)', // Make gauges smaller
+  },
+  servicesRow: {
+    display: 'flex',
+    gap: '6px',
+    overflowX: 'auto' as const,
+    paddingBottom: '8px',
+    marginBottom: '8px',
+    scrollbarWidth: 'none' as const,
+    whiteSpace: 'nowrap' as const,
   },
   devopsBar: {
     marginTop: 'auto',
