@@ -190,8 +190,7 @@ const styles = {
     borderBottom: '1px solid var(--border-glass)',
     position: 'sticky' as const,
     top: 0,
-    background: 'rgba(3, 3, 15, 0.7)',
-    backdropFilter: 'blur(12px)',
+    background: 'var(--bg-sidebar)',
     zIndex: 90,
   },
   title: {
@@ -243,7 +242,7 @@ const styles = {
     padding: '2px 6px',
     minWidth: '18px',
     textAlign: 'center' as const,
-    boxShadow: 'var(--glow-critical)',
+    boxShadow: 'var(--shadow-sm)',
   },
   dropdown: {
     position: 'absolute' as const,
@@ -251,7 +250,7 @@ const styles = {
     top: '40px',
     width: '320px',
     padding: '16px 0 0 0',
-    boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
+    boxShadow: 'var(--shadow-md)',
     animation: 'fadeIn 0.2s ease-out',
     overflow: 'hidden',
   },
@@ -325,7 +324,7 @@ const styles = {
     padding: '12px',
     textAlign: 'center' as const,
     borderTop: '1px solid var(--border-glass)',
-    background: 'rgba(0, 0, 0, 0.2)',
+    background: 'var(--bg-muted)',
   },
   viewAll: {
     fontSize: '13px',

@@ -310,9 +310,9 @@ export default function ServerDetailPage({
                 </div>
                 <div style={styles.macBody}>
                   {parsedServices.logs.sys ? parsedServices.logs.sys.split('\n').map((line: string, i: number) => {
-                    let color = '#00ff80';
-                    if (line.toLowerCase().includes('error') || line.toLowerCase().includes('failed')) color = '#ff5f56';
-                    else if (line.toLowerCase().includes('warn')) color = '#ffbd2e';
+                    let color = 'var(--text-terminal-success)';
+                    if (line.toLowerCase().includes('error') || line.toLowerCase().includes('failed')) color = 'var(--text-terminal-error)';
+                    else if (line.toLowerCase().includes('warn')) color = 'var(--text-terminal-warn)';
                     return <div key={i} style={{ color }}>{line}</div>;
                   }) : 'Waiting for logs...'}
                 </div>
@@ -331,9 +331,9 @@ export default function ServerDetailPage({
                 </div>
                 <div style={styles.macBody}>
                   {parsedServices.logs.nginx ? parsedServices.logs.nginx.split('\n').map((line: string, i: number) => {
-                    let color = '#00ff80';
-                    if (line.toLowerCase().includes('error') || line.toLowerCase().includes('failed')) color = '#ff5f56';
-                    else if (line.toLowerCase().includes('warn')) color = '#ffbd2e';
+                    let color = 'var(--text-terminal-success)';
+                    if (line.toLowerCase().includes('error') || line.toLowerCase().includes('failed')) color = 'var(--text-terminal-error)';
+                    else if (line.toLowerCase().includes('warn')) color = 'var(--text-terminal-warn)';
                     return <div key={i} style={{ color }}>{line}</div>;
                   }) : 'Waiting for logs...'}
                 </div>
@@ -406,6 +406,8 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-around',
     alignItems: 'center',
+    flexWrap: 'wrap' as const,
+    gap: '24px',
     padding: '32px 20px',
     marginBottom: '32px',
   },
@@ -441,20 +443,20 @@ const styles = {
     padding: '40px 0',
   },
   macTerminal: {
-    background: '#111',
+    background: 'var(--bg-terminal)',
     borderRadius: '8px',
     overflow: 'hidden',
-    border: '1px solid #333',
-    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+    border: '1px solid var(--border-glass)',
+    boxShadow: 'var(--shadow-md)',
   },
   macHeader: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     padding: '10px 16px',
-    background: '#222',
-    borderBottom: '1px solid #333',
-    color: '#888',
+    background: 'var(--bg-terminal-header)',
+    borderBottom: '1px solid var(--border-glass)',
+    color: 'var(--text-muted)',
     fontSize: '12px',
     fontFamily: 'monospace',
     position: 'relative' as const,
@@ -472,7 +474,7 @@ const styles = {
   },
   macBody: {
     padding: '16px',
-    color: '#00ff00',
+    color: 'var(--text-terminal-success)',
     fontFamily: 'monospace',
     fontSize: '12px',
     overflowY: 'auto' as const,

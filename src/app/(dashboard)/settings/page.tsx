@@ -128,8 +128,15 @@ export default function SettingsPage() {
         throw new Error('FCM is not supported or configuration is invalid.');
       }
 
-      // 3. Register service worker and get token
-      const registration = await navigator.serviceWorker.ready;
+      // 3. Register service worker explicitly and get token
+      const apiKey = encodeURIComponent(process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '');
+      const projectId = encodeURIComponent(process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '');
+      const messagingSenderId = encodeURIComponent(process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '');
+      const appId = encodeURIComponent(process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '');
+      
+      const swUrl = `/firebase-messaging-sw.js?apiKey=${apiKey}&projectId=${projectId}&messagingSenderId=${messagingSenderId}&appId=${appId}`;
+      const registration = await navigator.serviceWorker.register(swUrl, { scope: '/' });
+      await navigator.serviceWorker.ready;
       
       const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
       if (!vapidKey) {

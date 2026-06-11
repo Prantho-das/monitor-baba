@@ -209,7 +209,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     fontSize: '11px',
-    background: 'rgba(0,0,0,0.1)',
+    background: 'var(--bg-muted)',
     borderRadius: '4px',
     padding: '8px 12px',
   },
