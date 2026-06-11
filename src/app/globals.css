@@ -479,7 +479,7 @@ a {
   color: var(--color-critical);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .dashboard-main-content {
     margin-left: 0;
     margin-bottom: 70px;
