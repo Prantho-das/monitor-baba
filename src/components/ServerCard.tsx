@@ -118,16 +118,6 @@ export default function ServerCard({
         </div>
       </div>
 
-      {daemons && Object.keys(daemons).length > 0 && (
-        <div style={styles.servicesRow}>
-          {Object.entries(daemons).map(([key, isRunning]) => (
-            <span key={key} className={`service-badge ${isRunning ? 'active' : 'inactive'}`} title={key}>
-              <span className="dot" /> {key.substring(0, 4)}
-            </span>
-          ))}
-        </div>
-      )}
-
       <div style={styles.devopsBar}>
         <div style={styles.devopsItem}>
           <span style={styles.devopsLabel}>Load (1m, 5m, 15m)</span>
