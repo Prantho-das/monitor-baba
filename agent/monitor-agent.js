@@ -109,31 +109,65 @@ function detectServices() {
     const exec = require('child_process').exec;
     
     const servicesToCheck = [
-      { name: 'php', cmd: isWin ? 'php-cgi.exe' : 'php-fpm' },
+      { name: 'php', cmd: isWin ? 'php-cgi.exe' : 'php' },
       { name: 'mysql', cmd: isWin ? 'mysqld.exe' : 'mysqld' },
       { name: 'postgres', cmd: isWin ? 'postgres.exe' : 'postgres' },
       { name: 'node', cmd: isWin ? 'node.exe' : 'node' },
       { name: 'nginx', cmd: isWin ? 'nginx.exe' : 'nginx' },
-      { name: 'apache', cmd: isWin ? 'httpd.exe' : 'apache2' },
+      { name: 'apache', cmd: isWin ? 'httpd.exe' : 'apache' },
       { name: 'cron', cmd: isWin ? 'svchost.exe' : 'cron' },
       { name: 'supervisor', cmd: isWin ? 'supervisord.exe' : 'supervisord' },
       { name: 'redis', cmd: isWin ? 'redis-server.exe' : 'redis-server' },
       { name: 'docker', cmd: isWin ? 'dockerd.exe' : 'dockerd' },
     ];
 
-    const cmd = isWin ? 'tasklist' : 'ps -A';
-    exec(cmd, (err, stdout) => {
-      const running = {};
-      const out = stdout ? stdout.toLowerCase() : '';
-      servicesToCheck.forEach(s => {
-        if (s.name === 'apache' && !isWin) {
-          running[s.name] = out.includes('apache2') || out.includes('httpd');
-        } else {
-          running[s.name] = out.includes(s.cmd.toLowerCase());
-        }
+    if (isWin) {
+      exec('tasklist', (err, stdout) => {
+        const running = {};
+        const out = stdout ? stdout.toLowerCase() : '';
+        servicesToCheck.forEach(s => {
+          running[s.name] = {
+            running: out.includes(s.cmd.toLowerCase()),
+            cpu: 0,
+            mem: 0
+          };
+        });
+        resolve(running);
       });
-      resolve(running);
-    });
+    } else {
+      exec('ps -eo comm,%cpu,%mem --no-headers', (err, stdout) => {
+        const running = {};
+        servicesToCheck.forEach(s => running[s.name] = { running: false, cpu: 0, mem: 0 });
+        
+        if (stdout) {
+          const lines = stdout.trim().split('\n');
+          lines.forEach(line => {
+            const parts = line.trim().split(/\s+/);
+            if (parts.length >= 3) {
+              const comm = parts[0].toLowerCase();
+              const cpu = parseFloat(parts[1]) || 0;
+              const mem = parseFloat(parts[2]) || 0;
+              
+              servicesToCheck.forEach(s => {
+                const match = s.name === 'apache' ? (comm.includes('apache2') || comm.includes('httpd')) : comm.includes(s.cmd);
+                if (match) {
+                  running[s.name].running = true;
+                  running[s.name].cpu += cpu;
+                  running[s.name].mem += mem;
+                }
+              });
+            }
+          });
+        }
+        
+        Object.keys(running).forEach(k => {
+          running[k].cpu = Number(running[k].cpu.toFixed(1));
+          running[k].mem = Number(running[k].mem.toFixed(1));
+        });
+        
+        resolve(running);
+      });
+    }
   });
 }
 

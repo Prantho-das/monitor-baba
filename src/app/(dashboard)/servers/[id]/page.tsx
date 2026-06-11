@@ -170,9 +170,14 @@ export default function ServerDetailPage({
           <Link href="/servers" style={styles.backLink}>
             ← Back to Servers List
           </Link>
-          <button onClick={handleDelete} disabled={deleting} className="btn-danger" style={styles.deleteBtn}>
-            {deleting ? 'Deleting...' : '🗑️ Delete Server'}
-          </button>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button onClick={loadServerData} disabled={loading} className="btn-secondary" style={styles.deleteBtn}>
+              🔄 Refresh
+            </button>
+            <button onClick={handleDelete} disabled={deleting} className="btn-danger" style={styles.deleteBtn}>
+              {deleting ? 'Deleting...' : '🗑️ Delete Server'}
+            </button>
+          </div>
         </div>
 
         {/* Server Specs Meta Box */}
@@ -263,12 +268,25 @@ export default function ServerDetailPage({
               <h3>Running Services</h3>
             </div>
             <div className="glass-card" style={styles.servicesContainer}>
-              {Object.entries(parsedServices.daemons).map(([key, isRunning]) => (
-                <div key={key} className={`service-badge ${isRunning ? 'active' : 'inactive'}`} style={styles.largeBadge}>
-                  <span className="dot" style={styles.largeDot} />
-                  {key}
-                </div>
-              ))}
+              {Object.entries(parsedServices.daemons).map(([key, data]: [string, any]) => {
+                const isRunning = typeof data === 'object' ? data.running : data;
+                const cpu = typeof data === 'object' ? data.cpu : 0;
+                const mem = typeof data === 'object' ? data.mem : 0;
+
+                return (
+                  <div key={key} className={`service-badge ${isRunning ? 'active' : 'inactive'}`} style={styles.largeBadge}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span className="dot" style={styles.largeDot} />
+                      <span style={{ fontWeight: 'bold' }}>{key}</span>
+                    </div>
+                    {isRunning && typeof data === 'object' && (
+                      <div style={{ marginTop: '8px', fontSize: '10px', color: '#aaa', fontWeight: 'normal' }}>
+                        CPU: {cpu}% | RAM: {mem}%
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </>
         )}
@@ -281,22 +299,44 @@ export default function ServerDetailPage({
             </div>
             
             <div style={{ marginBottom: '24px' }}>
-              <div className="terminal-header">
-                <span>syslog (/var/log/syslog)</span>
-                <span>Bash</span>
-              </div>
-              <div className="terminal-viewer">
-                {parsedServices.logs.sys || 'Waiting for logs...'}
+              <div style={styles.macTerminal}>
+                <div style={styles.macHeader}>
+                  <div style={styles.macButtons}>
+                    <div style={{ ...styles.macBtn, background: '#ff5f56' }} />
+                    <div style={{ ...styles.macBtn, background: '#ffbd2e' }} />
+                    <div style={{ ...styles.macBtn, background: '#27c93f' }} />
+                  </div>
+                  <span>bash — /var/log/syslog</span>
+                </div>
+                <div style={styles.macBody}>
+                  {parsedServices.logs.sys ? parsedServices.logs.sys.split('\n').map((line: string, i: number) => {
+                    let color = '#00ff80';
+                    if (line.toLowerCase().includes('error') || line.toLowerCase().includes('failed')) color = '#ff5f56';
+                    else if (line.toLowerCase().includes('warn')) color = '#ffbd2e';
+                    return <div key={i} style={{ color }}>{line}</div>;
+                  }) : 'Waiting for logs...'}
+                </div>
               </div>
             </div>
 
             <div style={{ marginBottom: '32px' }}>
-              <div className="terminal-header">
-                <span>nginx (/var/log/nginx/error.log)</span>
-                <span>Bash</span>
-              </div>
-              <div className="terminal-viewer">
-                {parsedServices.logs.nginx || 'Waiting for logs...'}
+              <div style={styles.macTerminal}>
+                <div style={styles.macHeader}>
+                  <div style={styles.macButtons}>
+                    <div style={{ ...styles.macBtn, background: '#ff5f56' }} />
+                    <div style={{ ...styles.macBtn, background: '#ffbd2e' }} />
+                    <div style={{ ...styles.macBtn, background: '#27c93f' }} />
+                  </div>
+                  <span>bash — /var/log/nginx/error.log</span>
+                </div>
+                <div style={styles.macBody}>
+                  {parsedServices.logs.nginx ? parsedServices.logs.nginx.split('\n').map((line: string, i: number) => {
+                    let color = '#00ff80';
+                    if (line.toLowerCase().includes('error') || line.toLowerCase().includes('failed')) color = '#ff5f56';
+                    else if (line.toLowerCase().includes('warn')) color = '#ffbd2e';
+                    return <div key={i} style={{ color }}>{line}</div>;
+                  }) : 'Waiting for logs...'}
+                </div>
               </div>
             </div>
           </>
@@ -399,5 +439,45 @@ const styles = {
     color: 'var(--accent-cyan)',
     animation: 'pulse-glow 1.5s infinite ease-in-out',
     padding: '40px 0',
+  },
+  macTerminal: {
+    background: '#111',
+    borderRadius: '8px',
+    overflow: 'hidden',
+    border: '1px solid #333',
+    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+  },
+  macHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '10px 16px',
+    background: '#222',
+    borderBottom: '1px solid #333',
+    color: '#888',
+    fontSize: '12px',
+    fontFamily: 'monospace',
+    position: 'relative' as const,
+  },
+  macButtons: {
+    display: 'flex',
+    gap: '6px',
+    position: 'absolute' as const,
+    left: '16px',
+  },
+  macBtn: {
+    width: '12px',
+    height: '12px',
+    borderRadius: '50%',
+  },
+  macBody: {
+    padding: '16px',
+    color: '#00ff00',
+    fontFamily: 'monospace',
+    fontSize: '12px',
+    overflowY: 'auto' as const,
+    maxHeight: '300px',
+    whiteSpace: 'pre-wrap' as const,
+    lineHeight: '1.5',
   },
 };
