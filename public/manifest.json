@@ -1,6 +1,6 @@
 {
-  "name": "Mooonitooor Server Monitoring",
-  "short_name": "Mooonitooor",
+  "name": "Monitor-Baba Server Monitoring",
+  "short_name": "Monitor-Baba",
   "description": "Real-time Server Monitoring and Mobile Alerts Dashboard",
   "start_url": "/dashboard",
   "display": "standalone",

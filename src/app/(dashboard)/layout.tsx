@@ -20,9 +20,9 @@ export default function DashboardLayout({
   }
 
   return (
-    <div style={styles.container}>
+    <div className="dashboard-container">
       <Sidebar />
-      <main style={styles.mainContent}>
+      <main className="dashboard-main-content">
         {children}
       </main>
     </div>
@@ -30,25 +30,12 @@ export default function DashboardLayout({
 }
 
 const styles = {
-  container: {
-    display: 'flex',
-    minHeight: '100vh',
-    background: '#03030f',
-  },
-  mainContent: {
-    flex: 1,
-    marginLeft: '260px', // Matches Sidebar width
-    minHeight: '100vh',
-    position: 'relative' as const,
-    display: 'flex',
-    flexDirection: 'column' as const,
-  },
   loadingContainer: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: '100vh',
-    background: '#03030f',
+    background: 'var(--bg-main)',
   },
   loadingPulse: {
     fontSize: '18px',
