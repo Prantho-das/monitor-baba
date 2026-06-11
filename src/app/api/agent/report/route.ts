@@ -206,12 +206,13 @@ export async function POST(request: Request) {
                 .from('alerts')
                 .update({ notification_sent: true })
                 .eq('id', offlineAlert.id);
-            }
           }
         }
       }
+    }
+
     // 6. Return successful response with latest version
-    const CURRENT_AGENT_VERSION = "1.1.0";
+    const CURRENT_AGENT_VERSION = process.env.AGENT_VERSION || "1.1.0";
     return NextResponse.json({ success: true, latestVersion: CURRENT_AGENT_VERSION });
   } catch (err: any) {
     console.error('Error in agent reporting route:', err);
