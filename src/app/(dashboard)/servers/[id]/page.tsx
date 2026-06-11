@@ -39,6 +39,7 @@ export default function ServerDetailPage({
   const router = useRouter();
   const [server, setServer] = useState<Server | null>(null);
   const [metrics, setMetrics] = useState<MetricPoint[]>([]);
+  const [incidents, setIncidents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
 
@@ -59,6 +60,15 @@ export default function ServerDetailPage({
       const data = await res.json();
       setServer(data.server);
       setMetrics(data.metrics || []);
+
+      // Fetch incidents
+      const incRes = await fetch(`/api/servers/${id}/metrics?type=incidents`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (incRes.ok) {
+        const incData = await incRes.json();
+        setIncidents(incData.data || []);
+      }
     } catch (err) {
       console.error('Failed to load server details:', err);
       router.push('/servers');
@@ -259,6 +269,46 @@ export default function ServerDetailPage({
             label="Disk Storage Trend"
             color="var(--color-warning)"
           />
+          <MetricChart
+            data={metrics}
+            metricKey="network_in_mb"
+            label="Network Download (RX)"
+            color="#34d399"
+          />
+          <MetricChart
+            data={metrics}
+            metricKey="network_out_mb"
+            label="Network Upload (TX)"
+            color="#60a5fa"
+          />
+        </div>
+
+        {/* Incident Timeline */}
+        <div style={styles.sectionTitle}>
+          <h3>Incident History Log</h3>
+        </div>
+        <div className="glass-card" style={{ padding: '0', marginBottom: '32px', overflow: 'hidden' }}>
+          {incidents.length === 0 ? (
+            <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)' }}>
+              No critical incidents recorded.
+            </div>
+          ) : (
+            <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+              {incidents.map((incident) => (
+                <div key={incident.id} style={styles.incidentRow}>
+                  <div style={styles.incidentTime}>
+                    {new Date(incident.created_at).toLocaleString()}
+                  </div>
+                  <div style={{ ...styles.incidentType, color: incident.severity === 'critical' ? 'var(--color-critical)' : 'var(--color-warning)' }}>
+                    {incident.type.toUpperCase()}
+                  </div>
+                  <div style={styles.incidentMsg}>
+                    {incident.message}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Running Services */}
@@ -441,6 +491,30 @@ const styles = {
     color: 'var(--accent-cyan)',
     animation: 'pulse-glow 1.5s infinite ease-in-out',
     padding: '40px 0',
+  },
+  incidentRow: {
+    display: 'grid',
+    gridTemplateColumns: '150px 100px 1fr',
+    gap: '16px',
+    padding: '16px 24px',
+    borderBottom: '1px solid var(--border-glass)',
+    alignItems: 'center',
+    fontSize: '13px',
+  },
+  incidentTime: {
+    color: 'var(--text-muted)',
+    fontSize: '11px',
+  },
+  incidentType: {
+    fontWeight: 'bold',
+    fontSize: '11px',
+    padding: '4px 8px',
+    background: 'rgba(255,255,255,0.05)',
+    borderRadius: '4px',
+    textAlign: 'center' as const,
+  },
+  incidentMsg: {
+    color: 'var(--text-primary)',
   },
   macTerminal: {
     background: 'var(--bg-terminal)',

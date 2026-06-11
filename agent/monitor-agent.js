@@ -58,6 +58,57 @@ function getCpuUsage() {
   });
 }
 
+// Function to get network bandwidth (TX/RX)
+function getNetworkUsage() {
+  return new Promise((resolve) => {
+    const isWin = os.platform() === 'win32';
+    const exec = require('child_process').exec;
+
+    if (isWin) {
+      // Basic fallback for Windows (WMI is too slow for 1s diffing)
+      resolve({ rxMb: 0, txMb: 0 });
+    } else {
+      exec("cat /proc/net/dev | grep -v 'lo:' | awk '{print $1,$2,$10}'", (err, stdout) => {
+        if (err || !stdout) return resolve({ rxMb: 0, txMb: 0 });
+        
+        let initialRx = 0;
+        let initialTx = 0;
+        stdout.trim().split('\n').slice(2).forEach(line => {
+          const parts = line.trim().split(/[\s:]+/);
+          if (parts.length >= 3) {
+            initialRx += parseInt(parts[1]) || 0;
+            initialTx += parseInt(parts[2]) || 0;
+          }
+        });
+
+        setTimeout(() => {
+          exec("cat /proc/net/dev | grep -v 'lo:' | awk '{print $1,$2,$10}'", (err, stdout2) => {
+            if (err || !stdout2) return resolve({ rxMb: 0, txMb: 0 });
+            
+            let finalRx = 0;
+            let finalTx = 0;
+            stdout2.trim().split('\n').slice(2).forEach(line => {
+              const parts = line.trim().split(/[\s:]+/);
+              if (parts.length >= 3) {
+                finalRx += parseInt(parts[1]) || 0;
+                finalTx += parseInt(parts[2]) || 0;
+              }
+            });
+
+            // Calculate MB per second
+            const rxDiff = Math.max(0, finalRx - initialRx);
+            const txDiff = Math.max(0, finalTx - initialTx);
+            resolve({
+              rxMb: Number((rxDiff / 1024 / 1024).toFixed(2)),
+              txMb: Number((txDiff / 1024 / 1024).toFixed(2))
+            });
+          });
+        }, 1000);
+      });
+    }
+  });
+}
+
 // Function to check disk usage using shell commands
 function getDiskUsage() {
   return new Promise((resolve) => {
@@ -208,6 +259,7 @@ async function collectMetrics() {
 
   const cpuPercent = await getCpuUsage();
   const diskPercent = await getDiskUsage();
+  const network = await getNetworkUsage();
   const processCount = await getProcessCount();
   const daemons = await detectServices();
   const serverLogs = await tailLogs();
@@ -218,8 +270,8 @@ async function collectMetrics() {
     cpuPercent,
     ramPercent,
     diskPercent,
-    networkInMb: 0,
-    networkOutMb: 0,
+    networkInMb: network.rxMb,
+    networkOutMb: network.txMb,
     uptimeSeconds: Math.round(os.uptime()),
     osInfo: `${os.type()} ${os.release()} (${os.arch()})`,
     hostname: os.hostname(),

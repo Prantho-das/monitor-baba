@@ -5,6 +5,9 @@ interface MetricPoint {
   cpu_percent: number;
   ram_percent: number;
   disk_percent: number;
+  network_in_mb?: number;
+  network_out_mb?: number;
+  [key: string]: any;
 }
 
 export default function MetricChart({
@@ -14,7 +17,7 @@ export default function MetricChart({
   color = 'var(--accent-cyan)',
 }: {
   data: MetricPoint[];
-  metricKey: 'cpu_percent' | 'ram_percent' | 'disk_percent';
+  metricKey: keyof MetricPoint;
   label: string;
   color?: string;
 }) {
@@ -36,13 +39,18 @@ export default function MetricChart({
   const sortedData = [...data].reverse();
 
   // Find scale boundaries
-  const maxVal = 100;
+  let maxVal = 100;
   const minVal = 0;
+  
+  if (metricKey.toString().includes('network')) {
+    const highest = Math.max(...sortedData.map(d => Number(d[metricKey]) || 0));
+    maxVal = highest > 10 ? Math.ceil(highest * 1.2) : 10;
+  }
 
   // Generate coordinate points for polyline
   const points = sortedData
     .map((point, index) => {
-      const val = point[metricKey];
+      const val = Number(point[metricKey]) || 0;
       const x = padding + (index / (sortedData.length - 1 || 1)) * (width - padding * 2);
       const y = height - padding - ((val - minVal) / (maxVal - minVal || 1)) * (height - padding * 2);
       return `${x},${y}`;
@@ -60,7 +68,8 @@ export default function MetricChart({
       <div style={styles.header}>
         <span style={styles.label}>{label}</span>
         <span style={{ ...styles.currentVal, color }}>
-          {sortedData[sortedData.length - 1]?.[metricKey].toFixed(1)}%
+          {Number(sortedData[sortedData.length - 1]?.[metricKey] || 0).toFixed(1)}
+          {metricKey.toString().includes('network') ? ' MB/s' : '%'}
         </span>
       </div>
 
