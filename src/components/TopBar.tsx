@@ -99,7 +99,7 @@ export default function TopBar({ title }: { title: string }) {
   };
 
   return (
-    <header className="h-[70px] flex items-center justify-between px-10 border-b border-borderg sticky top-0 bg-sidebar/80 backdrop-blur-md z-50 transition-colors duration-300">
+    <header className="h-[70px] flex items-center justify-between px-10 border-b border-borderg sticky top-0 bg-sidebar backdrop-blur-md z-50 transition-colors duration-300">
       <h2 className="text-xl font-semibold text-textp">{title}</h2>
 
       <div className="flex items-center gap-5" ref={dropdownRef}>

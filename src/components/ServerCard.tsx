@@ -117,7 +117,7 @@ export default function ServerCard({
         </div>
       </div>
 
-      <div className="mt-auto pt-3 border-t border-borderg flex justify-between text-[11px] bg-muted/50 rounded p-2">
+      <div className="mt-auto pt-3 border-t border-borderg flex justify-between text-[11px] bg-muted rounded p-2">
         <div className="flex flex-col gap-0.5">
           <span className="text-textm text-[9px] uppercase tracking-wider">Load (1m, 5m, 15m)</span>
           <span className="text-textp font-semibold">
