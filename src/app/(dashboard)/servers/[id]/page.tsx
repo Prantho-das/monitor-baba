@@ -8,6 +8,7 @@ import TopBar from '@/components/TopBar';
 import MetricGauge from '@/components/MetricGauge';
 import MetricChart from '@/components/MetricChart';
 import AgentInstaller from '@/components/AgentInstaller';
+import AdBanner from '@/components/AdBanner';
 
 interface Server {
   id: string;
@@ -225,6 +226,7 @@ export default function ServerDetailPage({
         </div>
 
         {/* Gauges section */}
+        <AdBanner dataAdSlot="top-slot-12345" />
         <div style={styles.sectionTitle}>
           <h3>Real-time Utilization</h3>
         </div>
@@ -247,6 +249,7 @@ export default function ServerDetailPage({
         </div>
 
         {/* Historical Charts */}
+        <AdBanner dataAdSlot="middle-slot-12345" />
         <div style={styles.sectionTitle}>
           <h3>Telemetry History (Last 30 cycles)</h3>
         </div>

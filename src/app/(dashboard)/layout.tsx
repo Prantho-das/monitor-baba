@@ -9,9 +9,9 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   // Guard dashboard routes (require user session)
-  const { loading } = useAuth(true);
+  const { loading, user } = useAuth(true);
 
-  if (loading) {
+  if (loading || !user) {
     return (
       <div style={styles.loadingContainer}>
         <div style={styles.loadingPulse}>Initialising Dashboard...</div>
