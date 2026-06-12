@@ -19,6 +19,11 @@ interface AlertSettings {
 
 export default function SettingsPage() {
   const [profile, setProfile] = useState<{ full_name: string } | null>(null);
+  const [profileName, setProfileName] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [updatingProfile, setUpdatingProfile] = useState(false);
+  const [profileMsg, setProfileMsg] = useState<{type: 'success'|'error', text: string} | null>(null);
+
   const [settings, setSettings] = useState<AlertSettings>({
     cpu_threshold: 90,
     ram_threshold: 90,
@@ -51,7 +56,10 @@ export default function SettingsPage() {
         .select('full_name')
         .eq('id', userId)
         .single();
-      if (profileData) setProfile(profileData);
+      if (profileData) {
+        setProfile(profileData);
+        setProfileName(profileData.full_name || '');
+      }
 
       // 2. Fetch Alert Settings
       const { data: settingsData } = await supabase
@@ -107,6 +115,44 @@ export default function SettingsPage() {
       alert('Failed to save settings: ' + (err as any).message);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUpdatingProfile(true);
+    setProfileMsg(null);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not logged in");
+
+      // Update name if changed
+      if (profileName !== profile?.full_name) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({ full_name: profileName })
+          .eq('id', session.user.id);
+        
+        if (profileError) throw profileError;
+        setProfile({ full_name: profileName });
+      }
+
+      // Update password if provided
+      if (newPassword) {
+        const { error: authError } = await supabase.auth.updateUser({
+          password: newPassword
+        });
+        if (authError) throw authError;
+        setNewPassword(''); // clear password field after success
+      }
+
+      setProfileMsg({ type: 'success', text: 'Account updated successfully!' });
+      setTimeout(() => setProfileMsg(null), 3000);
+    } catch (err: any) {
+      setProfileMsg({ type: 'error', text: err.message || 'Failed to update account' });
+    } finally {
+      setUpdatingProfile(false);
     }
   };
 
@@ -374,16 +420,49 @@ export default function SettingsPage() {
                 )}
               </div>
 
-              <div className="glass-card p-6 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-hover flex items-center justify-center text-texts border border-borderg">
-                  <User size={24} />
+              <form onSubmit={handleUpdateProfile} className="glass-card p-6 flex flex-col gap-5">
+                <h3 className="text-[15px] font-semibold text-textp flex items-center gap-2 mb-1 tracking-tight">
+                  <User size={16} className="text-texts" /> Account & Security
+                </h3>
+                
+                <p className="text-[13px] text-texts leading-relaxed -mt-3">
+                  Update your display name or change your password.
+                </p>
+
+                {profileMsg && (
+                  <div className={`px-4 py-3 rounded-lg text-[13px] flex items-center gap-2 ${profileMsg.type === 'success' ? 'bg-online/10 text-online border border-online/20' : 'bg-critical/10 text-critical border border-critical/20'}`}>
+                    {profileMsg.type === 'success' && <Check size={16} />}
+                    {profileMsg.text}
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] font-bold text-texts uppercase tracking-wider">Full Name</label>
+                  <input
+                    type="text"
+                    className="glass-input"
+                    value={profileName}
+                    onChange={(e) => setProfileName(e.target.value)}
+                    placeholder="Enter full name"
+                    required
+                  />
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-[11px] font-bold text-texts uppercase tracking-wider mb-1">Identity</span>
-                  <h4 className="text-[16px] font-semibold text-textp">{profile?.full_name || 'Administrator'}</h4>
-                  <span className="text-[12px] text-texts mt-0.5">Role: System Owner</span>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] font-bold text-texts uppercase tracking-wider">New Password</label>
+                  <input
+                    type="password"
+                    className="glass-input"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Leave blank to keep current"
+                  />
                 </div>
-              </div>
+
+                <button type="submit" className="btn-secondary w-full mt-2" disabled={updatingProfile}>
+                  {updatingProfile ? 'Updating...' : 'Update Account'}
+                </button>
+              </form>
             </div>
 
           </div>

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 
 export async function POST(request: Request) {
   try {
@@ -17,8 +18,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'FCM Token is required' }, { status: 400 });
     }
 
-    // Upsert FCM token for user
-    const { data, error } = await supabase
+    // Upsert FCM token for user bypassing RLS
+    const { data, error } = await supabaseAdmin
       .from('fcm_tokens')
       .upsert(
         {
