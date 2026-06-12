@@ -31,6 +31,8 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <link rel="icon" href="/logo.png" />
         <link rel="apple-touch-icon" href="/logo.png" />
+        {/* Google AdSense Script */}
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossOrigin="anonymous"></script>
       </head>
       <body>
         <ServiceWorkerRegister />

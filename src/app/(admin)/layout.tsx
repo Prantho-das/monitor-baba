@@ -5,8 +5,6 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 
 // TODO: Sir, ekhane apnar actual email add korben.
-const ADMIN_EMAILS = ['admin@example.com', 'prantho@example.com'];
-
 export default function AdminLayout({
   children,
 }: {
@@ -25,8 +23,8 @@ export default function AdminLayout({
         return;
       }
 
-      const email = session.user.email;
-      if (email && ADMIN_EMAILS.includes(email)) {
+      const isSuperAdmin = session.user.app_metadata?.is_super_admin === true;
+      if (isSuperAdmin) {
         setIsAuthorized(true);
       } else {
         // Not an admin, redirect to regular dashboard

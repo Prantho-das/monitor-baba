@@ -9,40 +9,87 @@ export default function AdminDashboard() {
     totalServers: 0,
     activeServers: 0,
   });
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [processingId, setProcessingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadStats = async () => {
-      try {
-        // In a real app with RLS, the admin needs a special service role or an RPC function 
-        // to bypass RLS to count all users. 
-        // Here we do a basic fetch assuming the admin can see everything (requires proper RLS policies).
+  const loadData = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      // Fetch global server stats
+      const { count: serversCount } = await supabase
+        .from('servers')
+        .select('*', { count: 'exact', head: true });
         
-        const { count: serversCount } = await supabase
-          .from('servers')
-          .select('*', { count: 'exact', head: true });
-          
-        const { count: activeCount } = await supabase
-          .from('servers')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'online');
+      const { count: activeCount } = await supabase
+        .from('servers')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'online');
 
+      // Fetch users from our secure admin API
+      const res = await fetch('/api/admin/users', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(data.users || []);
+        
         setStats({
-          totalUsers: 0, // Profile count needs DB function if RLS prevents it
+          totalUsers: data.users?.length || 0,
           totalServers: serversCount || 0,
           activeServers: activeCount || 0,
         });
-      } catch (err) {
-        console.error('Failed to load admin stats', err);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (err) {
+      console.error('Failed to load admin data', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    loadStats();
+  useEffect(() => {
+    loadData();
   }, []);
 
-  if (loading) return <div>Loading global stats...</div>;
+  const handleToggleBan = async (userId: string, isBanned: boolean) => {
+    if (!confirm(`Are you sure you want to ${isBanned ? 'unban' : 'ban'} this user?`)) return;
+    
+    setProcessingId(userId);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const res = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId,
+          action: isBanned ? 'unban' : 'ban'
+        })
+      });
+
+      if (res.ok) {
+        // Refresh data
+        await loadData();
+      } else {
+        alert('Failed to update user status');
+      }
+    } catch (err) {
+      console.error('Ban toggle failed', err);
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  if (loading) return <div>Loading Admin Powers...</div>;
 
   return (
     <div>
@@ -50,20 +97,72 @@ export default function AdminDashboard() {
       
       <div style={styles.grid}>
         <div style={styles.card}>
+          <h3 style={styles.cardTitle}>Total Users</h3>
+          <p style={styles.cardValue}>{stats.totalUsers}</p>
+        </div>
+        <div style={styles.card}>
           <h3 style={styles.cardTitle}>Total Servers</h3>
           <p style={styles.cardValue}>{stats.totalServers}</p>
         </div>
         <div style={styles.card}>
           <h3 style={styles.cardTitle}>Online Servers</h3>
-          <p style={styles.cardValue} className="text-success">{stats.activeServers}</p>
+          <p style={styles.cardValue} className="text-success" style={{ color: 'var(--color-online)' }}>
+            {stats.activeServers}
+          </p>
         </div>
       </div>
       
-      <div style={{ marginTop: '40px', padding: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-        <h3>Admin Actions</h3>
-        <p style={{ color: '#aaa', marginTop: '8px', fontSize: '14px' }}>
-          This is your private admin space. You can add global user management or server deletion tools here.
-        </p>
+      <div style={{ marginTop: '40px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <h3>User Management</h3>
+        </div>
+        
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead>
+              <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
+                <th style={styles.th}>Email</th>
+                <th style={styles.th}>Joined Date</th>
+                <th style={styles.th}>Status</th>
+                <th style={styles.th}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map(user => (
+                <tr key={user.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <td style={styles.td}>{user.email}</td>
+                  <td style={styles.td}>{new Date(user.created_at).toLocaleDateString()}</td>
+                  <td style={styles.td}>
+                    {user.is_banned ? (
+                      <span style={{ color: 'var(--color-critical)', fontWeight: 'bold' }}>BANNED</span>
+                    ) : (
+                      <span style={{ color: 'var(--color-online)' }}>ACTIVE</span>
+                    )}
+                  </td>
+                  <td style={styles.td}>
+                    <button 
+                      onClick={() => handleToggleBan(user.id, user.is_banned)}
+                      disabled={processingId === user.id}
+                      style={{
+                        ...styles.actionBtn,
+                        background: user.is_banned ? 'rgba(255,255,255,0.1)' : 'var(--color-critical)'
+                      }}
+                    >
+                      {processingId === user.id ? 'Processing...' : (user.is_banned ? 'Unban User' : 'Ban User')}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {users.length === 0 && (
+                <tr>
+                  <td colSpan={4} style={{ padding: '20px', textAlign: 'center', color: '#888' }}>
+                    No users found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
@@ -72,7 +171,7 @@ export default function AdminDashboard() {
 const styles = {
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
     gap: '24px',
   },
   card: {
@@ -89,6 +188,25 @@ const styles = {
   },
   cardValue: {
     fontSize: '32px',
+    fontWeight: 'bold',
+  },
+  th: {
+    padding: '16px',
+    fontSize: '14px',
+    color: '#888',
+    fontWeight: 'normal',
+  },
+  td: {
+    padding: '16px',
+    fontSize: '14px',
+  },
+  actionBtn: {
+    border: 'none',
+    color: '#fff',
+    padding: '6px 12px',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '12px',
     fontWeight: 'bold',
   }
 };
