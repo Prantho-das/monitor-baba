@@ -83,6 +83,39 @@ export async function POST(request: Request) {
       disk_threshold: 95,
       offline_timeout_sec: 300,
       notifications_enabled: true,
+      discord_webhook_url: null,
+      telegram_webhook_url: null,
+    };
+
+    // Dispatch all alerts (Push, Discord, Telegram)
+    const dispatchAlerts = async (title: string, message: string, serverIdContext: string) => {
+      // Push notification
+      if (settings.notifications_enabled) {
+        await sendPushNotification(userId, title, message, { serverId: serverIdContext }).catch(console.error);
+      }
+      
+      // Discord Webhook
+      if (settings.discord_webhook_url) {
+        await fetch(settings.discord_webhook_url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content: `**${title}**\n${message}`
+          })
+        }).catch(console.error);
+      }
+
+      // Telegram Webhook
+      if (settings.telegram_webhook_url) {
+        await fetch(settings.telegram_webhook_url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: `*${title}*\n${message}`,
+            parse_mode: 'Markdown'
+          })
+        }).catch(console.error);
+      }
     };
 
     // Helper to evaluate and trigger alerts
@@ -118,13 +151,12 @@ export async function POST(request: Request) {
             .select()
             .single();
 
-          if (!insertErr && newAlert && settings.notifications_enabled) {
-            // Push notification
-            await sendPushNotification(
-              userId,
+          if (!insertErr && newAlert && (settings.notifications_enabled || settings.discord_webhook_url || settings.telegram_webhook_url)) {
+            // Dispatch alerts
+            await dispatchAlerts(
               `⚠️ Server Alert: ${server.name}`,
               alertMessage,
-              { serverId }
+              serverId
             );
             
             // Mark notification sent
@@ -194,12 +226,11 @@ export async function POST(request: Request) {
               .select()
               .single();
 
-            if (offlineAlert && settings.notifications_enabled) {
-              await sendPushNotification(
-                userId,
+            if (offlineAlert && (settings.notifications_enabled || settings.discord_webhook_url || settings.telegram_webhook_url)) {
+              await dispatchAlerts(
                 `🔴 Server Down: ${s.name}`,
                 `Server "${s.name}" went offline! No reports received for over ${Math.round(settings.offline_timeout_sec / 60)} minutes.`,
-                { serverId: s.id }
+                s.id
               );
 
               await supabase

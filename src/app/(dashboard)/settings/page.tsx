@@ -12,6 +12,8 @@ interface AlertSettings {
   disk_threshold: number;
   offline_timeout_sec: number;
   notifications_enabled: boolean;
+  discord_webhook_url?: string;
+  telegram_webhook_url?: string;
 }
 
 export default function SettingsPage() {
@@ -22,6 +24,8 @@ export default function SettingsPage() {
     disk_threshold: 95,
     offline_timeout_sec: 300,
     notifications_enabled: true,
+    discord_webhook_url: '',
+    telegram_webhook_url: '',
   });
 
   const [loading, setLoading] = useState(true);
@@ -90,6 +94,8 @@ export default function SettingsPage() {
           disk_threshold: Number(settings.disk_threshold),
           offline_timeout_sec: Number(settings.offline_timeout_sec),
           notifications_enabled: settings.notifications_enabled,
+          discord_webhook_url: settings.discord_webhook_url || null,
+          telegram_webhook_url: settings.telegram_webhook_url || null,
         })
         .eq('user_id', session.user.id);
 
@@ -252,6 +258,28 @@ export default function SettingsPage() {
                   required
                 />
                 <span style={styles.inputHelp}>Amount of time of missing telemetry before declaring the server offline.</span>
+              </div>
+
+              <div style={styles.fieldGroup}>
+                <label style={styles.label}>Discord Webhook URL</label>
+                <input
+                  type="url"
+                  className="glass-input"
+                  placeholder="https://discord.com/api/webhooks/..."
+                  value={settings.discord_webhook_url || ''}
+                  onChange={(e) => setSettings({ ...settings, discord_webhook_url: e.target.value })}
+                />
+              </div>
+
+              <div style={styles.fieldGroup}>
+                <label style={styles.label}>Telegram Webhook URL</label>
+                <input
+                  type="url"
+                  className="glass-input"
+                  placeholder="https://api.telegram.org/bot<token>/sendMessage?chat_id=<id>"
+                  value={settings.telegram_webhook_url || ''}
+                  onChange={(e) => setSettings({ ...settings, telegram_webhook_url: e.target.value })}
+                />
               </div>
 
               <div style={styles.toggleGroup}>
