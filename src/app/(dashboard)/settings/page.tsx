@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase/client';
 import { getFcmMessaging } from '@/lib/firebase/client';
 import { getToken } from 'firebase/messaging';
 import TopBar from '@/components/TopBar';
+import { Settings as SettingsIcon, BellRing, Smartphone, Check, User, Link as LinkIcon, HardDrive, Cpu, MemoryStick, Clock } from 'lucide-react';
 
 interface AlertSettings {
   cpu_threshold: number;
@@ -176,7 +177,7 @@ export default function SettingsPage() {
 
       if (res.ok) {
         setRegisteredToken(token);
-        alert('🔔 Success! Mobile Push notifications activated on this device.');
+        alert('Success! Mobile Push notifications activated on this device.');
       } else {
         const errData = await res.json();
         throw new Error(errData.error || 'API token registration failed');
@@ -193,131 +194,165 @@ export default function SettingsPage() {
     <>
       <TopBar title="Account & Alert Settings" />
 
-      <div className="page-container" style={styles.container}>
+      <div className="page-container">
         {loading ? (
-          <div style={styles.loadingPulse}>Querying configuration profiles...</div>
+          <div className="text-[15px] font-medium text-texts animate-pulse py-10">
+            Querying configuration profiles...
+          </div>
         ) : (
-          <div style={styles.layoutGrid}>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             {/* Left side: Alert thresholds and settings form */}
-            <form onSubmit={handleSaveSettings} className="glass-card" style={styles.formCard}>
-              <h3 style={styles.sectionTitle}>⚙️ Alert Threshold Configuration</h3>
-              <p style={styles.sectionSubtitle}>Define metrics thresholds that will trigger critical alerts and mobile push events.</p>
+            <form onSubmit={handleSaveSettings} className="lg:col-span-2 glass-card p-8 flex flex-col gap-6">
+              <div className="border-b border-borderg pb-4 mb-2">
+                <h3 className="text-[17px] font-semibold text-textp flex items-center gap-2 tracking-tight">
+                  <SettingsIcon size={18} className="text-texts" /> Alert Threshold Configuration
+                </h3>
+                <p className="text-[13px] text-texts mt-1 leading-relaxed">
+                  Define metrics thresholds that will trigger critical alerts and mobile push events.
+                </p>
+              </div>
               
               {saveSuccess && (
-                <div style={styles.successAlert}>✓ Settings updated successfully!</div>
+                <div className="bg-online/10 border border-online/20 text-online px-4 py-3 rounded-lg text-[13px] flex items-center gap-2">
+                  <Check size={16} /> Settings updated successfully!
+                </div>
               )}
 
-              <div style={styles.fieldGroup}>
-                <label style={styles.label}>CPU Utilization Alert Threshold (%)</label>
-                <input
-                  type="number"
-                  className="glass-input"
-                  min="1"
-                  max="100"
-                  value={settings.cpu_threshold}
-                  onChange={(e) => setSettings({ ...settings, cpu_threshold: Number(e.target.value) })}
-                  required
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] font-bold text-texts uppercase tracking-wider flex items-center gap-1.5">
+                    <Cpu size={14} /> CPU Utilization Threshold (%)
+                  </label>
+                  <input
+                    type="number"
+                    className="glass-input"
+                    min="1"
+                    max="100"
+                    value={settings.cpu_threshold}
+                    onChange={(e) => setSettings({ ...settings, cpu_threshold: Number(e.target.value) })}
+                    required
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] font-bold text-texts uppercase tracking-wider flex items-center gap-1.5">
+                    <MemoryStick size={14} /> Memory Utilization Threshold (%)
+                  </label>
+                  <input
+                    type="number"
+                    className="glass-input"
+                    min="1"
+                    max="100"
+                    value={settings.ram_threshold}
+                    onChange={(e) => setSettings({ ...settings, ram_threshold: Number(e.target.value) })}
+                    required
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] font-bold text-texts uppercase tracking-wider flex items-center gap-1.5">
+                    <HardDrive size={14} /> Disk Capacity Threshold (%)
+                  </label>
+                  <input
+                    type="number"
+                    className="glass-input"
+                    min="1"
+                    max="100"
+                    value={settings.disk_threshold}
+                    onChange={(e) => setSettings({ ...settings, disk_threshold: Number(e.target.value) })}
+                    required
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-[11px] font-bold text-texts uppercase tracking-wider flex items-center gap-1.5">
+                    <Clock size={14} /> Offline Grace Timeout (Sec)
+                  </label>
+                  <input
+                    type="number"
+                    className="glass-input"
+                    min="30"
+                    value={settings.offline_timeout_sec}
+                    onChange={(e) => setSettings({ ...settings, offline_timeout_sec: Number(e.target.value) })}
+                    required
+                  />
+                  <span className="text-[11px] text-textm">Amount of time of missing telemetry before declaring the server offline.</span>
+                </div>
               </div>
 
-              <div style={styles.fieldGroup}>
-                <label style={styles.label}>Memory Utilization Alert Threshold (%)</label>
-                <input
-                  type="number"
-                  className="glass-input"
-                  min="1"
-                  max="100"
-                  value={settings.ram_threshold}
-                  onChange={(e) => setSettings({ ...settings, ram_threshold: Number(e.target.value) })}
-                  required
-                />
+              <div className="mt-4 border-t border-borderg pt-6">
+                <h4 className="text-[14px] font-semibold text-textp mb-4 flex items-center gap-2">
+                  <LinkIcon size={16} /> Webhook Integrations
+                </h4>
+                
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[11px] font-bold text-texts uppercase tracking-wider">Discord Webhook URL</label>
+                    <input
+                      type="url"
+                      className="glass-input"
+                      placeholder="https://discord.com/api/webhooks/..."
+                      value={settings.discord_webhook_url || ''}
+                      onChange={(e) => setSettings({ ...settings, discord_webhook_url: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[11px] font-bold text-texts uppercase tracking-wider">Telegram Webhook URL</label>
+                    <input
+                      type="url"
+                      className="glass-input"
+                      placeholder="https://api.telegram.org/bot<token>/sendMessage?chat_id=<id>"
+                      value={settings.telegram_webhook_url || ''}
+                      onChange={(e) => setSettings({ ...settings, telegram_webhook_url: e.target.value })}
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div style={styles.fieldGroup}>
-                <label style={styles.label}>Disk Capacity Alert Threshold (%)</label>
-                <input
-                  type="number"
-                  className="glass-input"
-                  min="1"
-                  max="100"
-                  value={settings.disk_threshold}
-                  onChange={(e) => setSettings({ ...settings, disk_threshold: Number(e.target.value) })}
-                  required
-                />
-              </div>
-
-              <div style={styles.fieldGroup}>
-                <label style={styles.label}>Offline Grace Timeout (Seconds)</label>
-                <input
-                  type="number"
-                  className="glass-input"
-                  min="30"
-                  value={settings.offline_timeout_sec}
-                  onChange={(e) => setSettings({ ...settings, offline_timeout_sec: Number(e.target.value) })}
-                  required
-                />
-                <span style={styles.inputHelp}>Amount of time of missing telemetry before declaring the server offline.</span>
-              </div>
-
-              <div style={styles.fieldGroup}>
-                <label style={styles.label}>Discord Webhook URL</label>
-                <input
-                  type="url"
-                  className="glass-input"
-                  placeholder="https://discord.com/api/webhooks/..."
-                  value={settings.discord_webhook_url || ''}
-                  onChange={(e) => setSettings({ ...settings, discord_webhook_url: e.target.value })}
-                />
-              </div>
-
-              <div style={styles.fieldGroup}>
-                <label style={styles.label}>Telegram Webhook URL</label>
-                <input
-                  type="url"
-                  className="glass-input"
-                  placeholder="https://api.telegram.org/bot<token>/sendMessage?chat_id=<id>"
-                  value={settings.telegram_webhook_url || ''}
-                  onChange={(e) => setSettings({ ...settings, telegram_webhook_url: e.target.value })}
-                />
-              </div>
-
-              <div style={styles.toggleGroup}>
+              <div className="mt-2 flex items-center gap-3 bg-hover p-4 rounded-lg border border-borderg">
                 <input
                   type="checkbox"
                   id="notifications_enabled"
                   checked={settings.notifications_enabled}
                   onChange={(e) => setSettings({ ...settings, notifications_enabled: e.target.checked })}
-                  style={styles.checkbox}
+                  className="w-4 h-4 cursor-pointer rounded border-borderg text-online focus:ring-online"
                 />
-                <label htmlFor="notifications_enabled" style={styles.checkboxLabel}>
-                  Enable Alert Notifications
+                <label htmlFor="notifications_enabled" className="text-[14px] font-medium text-textp cursor-pointer select-none">
+                  Enable Alert Notifications globally
                 </label>
               </div>
 
-              <button type="submit" className="btn-primary" disabled={saving} style={styles.saveBtn}>
+              <button type="submit" className="btn-primary self-start mt-2" disabled={saving}>
                 {saving ? 'Saving...' : 'Save Settings'}
               </button>
             </form>
 
             {/* Right side: Push Notification Registration and profile info */}
-            <div style={styles.rightColumn}>
-              <div className="glass-card" style={styles.fcmCard}>
-                <h3 style={styles.sectionTitle}>🔔 Mobile Push Notifications</h3>
-                <p style={styles.sectionSubtitle}>Connect this phone or browser to receive instant FCM notifications whenever thresholds are breached.</p>
+            <div className="flex flex-col gap-8">
+              <div className="glass-card p-6 flex flex-col gap-5">
+                <div>
+                  <h3 className="text-[15px] font-semibold text-textp flex items-center gap-2 mb-1 tracking-tight">
+                    <Smartphone size={16} className="text-texts" /> Mobile Push Alerts
+                  </h3>
+                  <p className="text-[13px] text-texts leading-relaxed">
+                    Connect this device to receive instant FCM notifications whenever thresholds are breached.
+                  </p>
+                </div>
                 
-                <div style={styles.statusBox}>
-                  <div style={styles.statusRow}>
-                    <span>Browser Permission:</span>
-                    <strong style={{
-                      color: fcmStatus === 'granted' ? 'var(--color-online)' : fcmStatus === 'denied' ? 'var(--color-critical)' : 'var(--color-warning)'
-                    }}>
+                <div className="bg-hover border border-borderg rounded-lg p-4 flex flex-col gap-3">
+                  <div className="flex justify-between items-center text-[12px] font-medium">
+                    <span className="text-texts">Browser Permission:</span>
+                    <strong className={
+                      fcmStatus === 'granted' ? 'text-online' : fcmStatus === 'denied' ? 'text-critical' : 'text-warning'
+                    }>
                       {fcmStatus.toUpperCase()}
                     </strong>
                   </div>
-                  <div style={styles.statusRow}>
-                    <span>Registration Status:</span>
-                    <strong style={{ color: registeredToken ? 'var(--color-online)' : 'var(--text-muted)' }}>
+                  <div className="flex justify-between items-center text-[12px] font-medium border-t border-borderg pt-3">
+                    <span className="text-texts">Registration Status:</span>
+                    <strong className={registeredToken ? 'text-online' : 'text-textm'}>
                       {registeredToken ? 'CONNECTED' : 'NOT CONNECTED'}
                     </strong>
                   </div>
@@ -326,23 +361,28 @@ export default function SettingsPage() {
                 <button
                   onClick={enablePushNotifications}
                   disabled={fcmLoading || fcmStatus === 'denied'}
-                  className="btn-primary"
-                  style={styles.notifyBtn}
+                  className="btn-secondary w-full"
                 >
-                  {fcmLoading ? 'Connecting...' : registeredToken ? 'Refresh Connection' : 'Enable Mobile Notifications'}
+                  <BellRing size={16} />
+                  {fcmLoading ? 'Connecting...' : registeredToken ? 'Refresh Connection' : 'Enable Device'}
                 </button>
 
                 {fcmStatus === 'denied' && (
-                  <p style={styles.deniedNotice}>
+                  <p className="text-[12px] text-critical leading-relaxed text-center bg-critical/10 p-3 rounded-lg border border-critical/20">
                     Push notifications are blocked. Please reset site permissions in your browser address bar to allow alerts.
                   </p>
                 )}
               </div>
 
-              <div className="glass-card" style={styles.profileCard}>
-                <h4 style={styles.profileTitle}>User Identity</h4>
-                <p style={styles.profileName}>{profile?.full_name || 'Administrator'}</p>
-                <div style={styles.profileLabel}>Role: Owner</div>
+              <div className="glass-card p-6 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-hover flex items-center justify-center text-texts border border-borderg">
+                  <User size={24} />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[11px] font-bold text-texts uppercase tracking-wider mb-1">Identity</span>
+                  <h4 className="text-[16px] font-semibold text-textp">{profile?.full_name || 'Administrator'}</h4>
+                  <span className="text-[12px] text-texts mt-0.5">Role: System Owner</span>
+                </div>
               </div>
             </div>
 
@@ -351,160 +391,4 @@ export default function SettingsPage() {
       </div>
     </>
   );
-}
-
-const styles = {
-  container: {
-    maxWidth: '1200px',
-  },
-  layoutGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1.5fr 1fr',
-    gap: '32px',
-  },
-  formCard: {
-    padding: '32px',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '24px',
-  },
-  sectionTitle: {
-    fontSize: '18px',
-    fontWeight: '600',
-    color: '#fff',
-  },
-  sectionSubtitle: {
-    fontSize: '13px',
-    color: 'var(--text-secondary)',
-    lineHeight: '1.5',
-    marginTop: '-12px',
-    marginBottom: '8px',
-  },
-  fieldGroup: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '8px',
-  },
-  label: {
-    fontSize: '12px',
-    color: 'var(--text-secondary)',
-    fontWeight: '600',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.5px',
-  },
-  inputHelp: {
-    fontSize: '11px',
-    color: 'var(--text-muted)',
-    marginTop: '2px',
-  },
-  toggleGroup: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    margin: '8px 0',
-  },
-  checkbox: {
-    width: '18px',
-    height: '18px',
-    cursor: 'pointer',
-  },
-  checkboxLabel: {
-    fontSize: '14px',
-    color: '#fff',
-    fontWeight: '500',
-    cursor: 'pointer',
-  },
-  saveBtn: {
-    alignSelf: 'flex-start',
-    padding: '12px 28px',
-  },
-  successAlert: {
-    background: 'rgba(0, 230, 118, 0.1)',
-    border: '1px solid rgba(0, 230, 118, 0.2)',
-    color: 'var(--color-online)',
-    padding: '12px 16px',
-    borderRadius: '8px',
-    fontSize: '14px',
-  },
-  rightColumn: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '32px',
-  },
-  fcmCard: {
-    padding: '32px',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '20px',
-  },
-  statusBox: {
-    background: 'rgba(0,0,0,0.2)',
-    border: '1px solid var(--border-glass)',
-    borderRadius: '12px',
-    padding: '16px',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '12px',
-  },
-  statusRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: '13px',
-    color: 'var(--text-secondary)',
-  },
-  notifyBtn: {
-    width: '100%',
-  },
-  deniedNotice: {
-    fontSize: '12px',
-    color: 'var(--color-critical)',
-    lineHeight: '1.4',
-    textAlign: 'center' as const,
-  },
-  profileCard: {
-    padding: '24px',
-    textAlign: 'center' as const,
-  },
-  profileTitle: {
-    fontSize: '11px',
-    color: 'var(--text-muted)',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '1px',
-    marginBottom: '8px',
-  },
-  profileName: {
-    fontSize: '18px',
-    fontWeight: '600',
-    color: '#fff',
-  },
-  profileLabel: {
-    display: 'inline-block',
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid var(--border-glass)',
-    borderRadius: '20px',
-    padding: '4px 12px',
-    fontSize: '11px',
-    color: 'var(--text-secondary)',
-    marginTop: '12px',
-  },
-  loadingPulse: {
-    fontSize: '16px',
-    color: 'var(--accent-cyan)',
-    animation: 'pulse-glow 1.5s infinite ease-in-out',
-    padding: '40px 0',
-  },
-};
-
-// Handle responsive resizing using media query in JS context for settings grid
-if (typeof window !== 'undefined') {
-  const mediaQuery = window.matchMedia('(max-width: 900px)');
-  const handleTabletChange = (e: MediaQueryListEvent | MediaQueryList) => {
-    if (e.matches) {
-      styles.layoutGrid.gridTemplateColumns = '1fr';
-    } else {
-      styles.layoutGrid.gridTemplateColumns = '1.5fr 1fr';
-    }
-  };
-  mediaQuery.addEventListener('change', handleTabletChange);
-  handleTabletChange(mediaQuery);
 }

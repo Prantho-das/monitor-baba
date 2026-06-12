@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase/client';
 import TopBar from '@/components/TopBar';
 import ServerCard from '@/components/ServerCard';
 import AddServerModal from '@/components/AddServerModal';
+import { Search, Plus, TerminalSquare } from 'lucide-react';
 
 interface Server {
   id: string;
@@ -44,7 +45,7 @@ export default function ServersPage() {
       if (Array.isArray(data)) {
         setServers(data);
 
-        // Fetch latest metrics for each server to display gauges
+        // Fetch latest metrics for each server to display progress bars
         const metricsMap: MetricMap = {};
         for (const s of data) {
           const detailRes = await fetch(`/api/servers/${s.id}`, {
@@ -96,29 +97,33 @@ export default function ServersPage() {
       <TopBar title="Registered Infrastructure" />
 
       <div className="page-container">
-        <div style={styles.actionHeader}>
-          <input
-            type="text"
-            className="glass-input"
-            placeholder="🔍 Search servers by name, hostname, or IP..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={styles.searchBar}
-          />
-          <button onClick={() => setModalOpen(true)} className="btn-primary" style={styles.addBtn}>
-            ➕ Add Server
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+          <div className="relative w-full max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-texts" size={16} />
+            <input
+              type="text"
+              className="glass-input pl-10"
+              placeholder="Search servers by name, hostname, or IP..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <button onClick={() => setModalOpen(true)} className="btn-primary whitespace-nowrap">
+            <Plus size={16} /> Add Server
           </button>
         </div>
 
         {loading ? (
-          <div style={styles.loadingPulse}>Querying connected assets...</div>
+          <div className="text-[15px] font-medium text-texts animate-pulse py-10">
+            Querying connected assets...
+          </div>
         ) : filteredServers.length === 0 ? (
-          <div className="glass-card" style={styles.emptyCard}>
-            <span style={styles.emptyIcon}>🔍</span>
-            <h4>No servers match your search</h4>
-            <p style={styles.emptyText}>
+          <div className="glass-card flex flex-col items-center justify-center py-20 px-6 text-center border-dashed">
+            <TerminalSquare size={48} className="text-texts mb-4" strokeWidth={1} />
+            <h4 className="text-[17px] font-semibold text-textp tracking-tight">No servers match your criteria</h4>
+            <p className="text-[14px] text-texts max-w-[400px] mx-auto mt-2 leading-relaxed">
               {servers.length === 0
-                ? 'Register a server to start collecting status indicators.'
+                ? 'Deploy our agent to your servers to begin collecting telemetry.'
                 : 'Try modifying your search criteria or register a new server.'}
             </p>
           </div>
@@ -143,48 +148,3 @@ export default function ServersPage() {
     </>
   );
 }
-
-const styles = {
-  actionHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '32px',
-    gap: '16px',
-    flexWrap: 'wrap' as const,
-  },
-  searchBar: {
-    flex: 1,
-    minWidth: '280px',
-  },
-  addBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-  loadingPulse: {
-    fontSize: '16px',
-    color: 'var(--accent-cyan)',
-    animation: 'pulse-glow 1.5s infinite ease-in-out',
-    padding: '40px 0',
-  },
-  emptyCard: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '60px 20px',
-    textAlign: 'center' as const,
-  },
-  emptyIcon: {
-    fontSize: '48px',
-    marginBottom: '16px',
-  },
-  emptyText: {
-    color: 'var(--text-secondary)',
-    fontSize: '14px',
-    maxWidth: '360px',
-    margin: '8px auto 0 auto',
-    lineHeight: '1.6',
-  },
-};

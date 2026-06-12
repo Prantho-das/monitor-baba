@@ -4,102 +4,85 @@
 
 @layer base {
   :root {
-    --bg-main: #f4f5f7;
-    --bg-sidebar: #ffffff;
+    --bg-main: #fafafa;
     --bg-card: #ffffff;
-    --bg-card-hover: #f9fafb;
-    --bg-muted: #f3f4f6;
-    --border-glass: #e5e7eb;
+    --bg-hover: #f4f4f5;
+    --border-line: #eaeaea;
     
-    --accent-cyan: #2563eb;
-    --color-online: #10b981;
-    --color-warning: #f59e0b;
-    --color-critical: #ef4444;
+    --accent: #000000;
+    --color-online: #0070f3;
+    --color-warning: #f5a623;
+    --color-critical: #e00;
     
-    --text-primary: #111827;
-    --text-secondary: #4b5563;
-    --text-muted: #9ca3af;
+    --text-primary: #000000;
+    --text-secondary: #666666;
+    --text-muted: #888888;
   }
 
   [data-theme='dark'] {
-    --bg-main: #0b0f19;
-    --bg-sidebar: #111827;
-    --bg-card: #1f2937;
-    --bg-card-hover: #374151;
-    --bg-muted: #111827;
-    --border-glass: #374151;
+    --bg-main: #000000;
+    --bg-card: #0a0a0a;
+    --bg-hover: #111111;
+    --border-line: #333333;
     
-    --accent-cyan: #3b82f6;
-    --color-online: #10b981;
-    --color-warning: #fbbf24;
-    --color-critical: #ef4444;
+    --accent: #ffffff;
+    --color-online: #0070f3;
+    --color-warning: #f5a623;
+    --color-critical: #ff0000;
     
-    --text-primary: #f9fafb;
-    --text-secondary: #d1d5db;
-    --text-muted: #6b7280;
+    --text-primary: #ededed;
+    --text-secondary: #a1a1aa;
+    --text-muted: #888888;
   }
 
   body {
-    @apply bg-base text-textp font-sans antialiased transition-colors duration-300;
+    @apply bg-base text-textp font-sans antialiased selection:bg-online/30;
   }
 }
 
 @layer components {
-  /* Legacy Glass Card */
   .glass-card {
-    @apply bg-card border border-borderg rounded-xl p-6 shadow-sm transition-all duration-300;
-  }
-  .glass-card:hover {
-    @apply bg-hover border-accent shadow-md -translate-y-1;
+    @apply bg-card border border-borderg rounded-xl p-6 shadow-sm transition-colors duration-200;
   }
   
   .glass-input {
-    @apply bg-base border border-borderg rounded-lg text-textp px-4 py-2 text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent transition-all duration-200;
+    @apply bg-base border border-borderg rounded-md text-textp px-3 py-2 text-sm focus:outline-none focus:border-texts focus:ring-1 focus:ring-texts transition-all duration-200 w-full;
   }
 
   .btn-primary {
-    @apply bg-accent text-white font-medium py-2 px-4 rounded-lg shadow-sm hover:shadow-neon hover:bg-blue-600 transition-all duration-300 inline-flex items-center justify-center gap-2 text-sm;
+    @apply bg-accent text-base font-medium py-2 px-4 rounded-md shadow-sm transition-opacity duration-200 hover:opacity-80 inline-flex items-center justify-center gap-2 text-sm;
   }
   
   .btn-secondary {
-    @apply bg-card hover:bg-hover border border-borderg text-textp font-medium py-2 px-4 rounded-lg shadow-sm transition-all duration-200 inline-flex items-center justify-center gap-2 text-sm;
+    @apply bg-card hover:bg-hover border border-borderg text-textp font-medium py-2 px-4 rounded-md transition-colors duration-200 inline-flex items-center justify-center gap-2 text-sm;
   }
 }
 
-/* Animations */
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-
-.pulse-indicator {
-  @apply w-2.5 h-2.5 rounded-full inline-block;
-}
-
-.pulse-indicator.online {
-  @apply bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)];
-  animation: pulse-glow 2s infinite ease-in-out;
-}
-
-.pulse-indicator.warning {
-  @apply bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)];
-  animation: pulse-glow 2s infinite ease-in-out;
-}
-
-.pulse-indicator.offline {
-  @apply bg-gray-500;
-}
-
-/* Legacy Utilities missing from globals */
 .dashboard-grid {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6;
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6;
 }
 
 .page-container {
-  @apply p-6 max-w-7xl mx-auto w-full animate-[fadeIn_0.3s_ease-out];
+  @apply p-8 max-w-[1400px] mx-auto w-full animate-[fadeIn_0.2s_ease-out];
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Minimalist scrollbar for a clean feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-line);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }

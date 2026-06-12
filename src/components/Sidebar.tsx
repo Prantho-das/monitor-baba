@@ -3,54 +3,64 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { LayoutDashboard, Server, Bell, Settings, ShieldAlert, LogOut, Hexagon } from 'lucide-react';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
 
   const menuItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: '📊' },
-    { name: 'Servers', path: '/servers', icon: '🖥️' },
-    { name: 'Alerts', path: '/alerts', icon: '🔔' },
-    { name: 'Settings', path: '/settings', icon: '⚙️' },
+    { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={18} /> },
+    { name: 'Servers', path: '/servers', icon: <Server size={18} /> },
+    { name: 'Alerts', path: '/alerts', icon: <Bell size={18} /> },
+    { name: 'Settings', path: '/settings', icon: <Settings size={18} /> },
   ];
 
   if (user?.app_metadata?.is_super_admin === true) {
-    menuItems.push({ name: 'Admin Panel', path: '/admin', icon: '👑' });
+    menuItems.push({ name: 'Admin Panel', path: '/admin', icon: <ShieldAlert size={18} /> });
   }
 
   return (
-    <aside className="fixed left-0 top-0 w-64 h-screen bg-sidebar border-r border-hover flex flex-col z-[100] transition-all duration-300">
-      <div className="p-6 flex items-center gap-3 border-b border-hover">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.png" alt="Monitor Baba Logo" className="w-9 h-9 rounded-lg shadow-sm" />
-        <span className="font-bold text-lg bg-gradient-to-r from-indigo-400 to-accent bg-clip-text text-transparent tracking-tight">Monitor-Baba</span>
+    <aside className="fixed left-0 top-0 w-64 h-screen bg-card border-r border-borderg flex flex-col z-[100] transition-colors duration-200">
+      <div className="p-6 flex items-center gap-3 border-b border-borderg h-[70px]">
+        <Hexagon size={24} className="text-online" />
+        <span className="font-semibold text-lg text-textp tracking-tight">Monitor-Baba</span>
       </div>
 
-      <nav className="flex-1 p-4 flex flex-col gap-2 overflow-y-auto">
+      <nav className="flex-1 px-4 py-6 flex flex-col gap-1 overflow-y-auto">
         {menuItems.map((item) => {
           const isActive = pathname === item.path || pathname.startsWith(item.path + '/');
           return (
             <Link
               key={item.path}
               href={item.path}
-              className={`relative flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${isActive ? 'bg-hover text-white shadow-sm' : 'text-textm hover:bg-card hover:text-textp'}`}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-[13px] font-medium transition-colors duration-200 ${
+                isActive 
+                  ? 'bg-hover text-textp font-semibold' 
+                  : 'text-texts hover:text-textp hover:bg-hover'
+              }`}
             >
-              <span className="text-lg">{item.icon}</span>
+              <span className={isActive ? 'text-textp' : 'text-textm'}>{item.icon}</span>
               <span>{item.name}</span>
-              {isActive && <div className="absolute left-0 top-1/4 h-1/2 w-1 bg-accent rounded-r-md" />}
             </Link>
           );
         })}
-        <button onClick={signOut} className="flex lg:hidden items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-all duration-200">
-          <span className="text-lg">🚪</span>
+        <button 
+          onClick={signOut} 
+          className="lg:hidden flex items-center gap-3 px-3 py-2.5 rounded-md text-[13px] font-medium text-texts hover:text-textp hover:bg-hover transition-colors mt-1"
+        >
+          <LogOut size={18} className="text-textm" />
           <span>Sign Out</span>
         </button>
       </nav>
 
-      <div className="p-4 border-t border-hover">
-        <button onClick={signOut} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-all duration-200">
-          <span className="text-lg">🚪</span> Sign Out
+      <div className="p-4 border-t border-borderg">
+        <button 
+          onClick={signOut} 
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-[13px] font-medium text-texts hover:text-textp hover:bg-hover transition-colors"
+        >
+          <LogOut size={18} className="text-textm" />
+          <span>Sign Out</span>
         </button>
       </div>
     </aside>

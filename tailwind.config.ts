@@ -10,14 +10,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Light mode variables
         base: 'var(--bg-main)',
-        sidebar: 'var(--bg-sidebar)',
         card: 'var(--bg-card)',
-        hover: 'var(--bg-card-hover)',
-        muted: 'var(--bg-muted)',
-        borderg: 'var(--border-glass)',
-        accent: 'var(--accent-cyan)',
+        hover: 'var(--bg-hover)',
+        borderg: 'var(--border-line)',
+        accent: 'var(--accent)',
         online: 'var(--color-online)',
         warning: 'var(--color-warning)',
         critical: 'var(--color-critical)',
@@ -27,11 +24,13 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
-        mono: ['Roboto Mono', 'monospace'],
+        mono: ['Menlo', 'Monaco', 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier New', 'monospace'],
       },
       boxShadow: {
-        'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
-        'neon': '0 0 10px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3)',
+        'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+        'md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        'card': '0 0 0 1px var(--border-line), 0 2px 4px rgba(0,0,0,0.02)',
+        'card-hover': '0 0 0 1px var(--border-line), 0 4px 8px rgba(0,0,0,0.04)',
       }
     },
   },

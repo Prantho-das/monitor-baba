@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import TopBar from '@/components/TopBar';
+import { Check, CheckCircle2, AlertTriangle, Info, BellRing } from 'lucide-react';
 
 interface Alert {
   id: string;
@@ -104,15 +105,15 @@ export default function AlertsPage() {
     }
   };
 
-  const getSeverityColor = (severity: string) => {
+  const getSeverityIcon = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return 'var(--color-critical)';
+        return <AlertTriangle size={16} className="text-critical" />;
       case 'warning':
-        return 'var(--color-warning)';
+        return <AlertTriangle size={16} className="text-warning" />;
       case 'info':
       default:
-        return 'var(--accent-cyan)';
+        return <Info size={16} className="text-online" />;
     }
   };
 
@@ -122,61 +123,65 @@ export default function AlertsPage() {
     <>
       <TopBar title="Alert History Log" />
 
-      <div className="page-container">
-        <div style={styles.actionHeader}>
-          <div>
-            <span style={styles.summaryText}>
+      <div className="page-container max-w-[1000px]">
+        <div className="flex justify-between items-center mb-8 border-b border-borderg pb-4">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-lg font-semibold text-textp tracking-tight">System Events</h2>
+            <span className="text-[13px] text-texts font-medium">
               {unreadAlerts.length} Unread / {alerts.length} Total Alerts Logged
             </span>
           </div>
           {unreadAlerts.length > 0 && (
-            <button onClick={markAllRead} className="btn-secondary" style={styles.markAllBtn}>
-              ✓ Mark All as Read
+            <button onClick={markAllRead} className="btn-secondary">
+              <Check size={16} /> Mark All as Read
             </button>
           )}
         </div>
 
         {loading ? (
-          <div style={styles.loadingPulse}>Querying alert history...</div>
+          <div className="text-[15px] font-medium text-texts animate-pulse py-10">
+            Querying alert history...
+          </div>
         ) : alerts.length === 0 ? (
-          <div className="glass-card" style={styles.emptyCard}>
-            <span style={styles.emptyIcon}>🎉</span>
-            <h4>No alerts logged yet</h4>
-            <p style={styles.emptyText}>All connected servers are performing normally. No threshold violations recorded.</p>
+          <div className="glass-card flex flex-col items-center justify-center py-24 px-6 text-center border-dashed">
+            <CheckCircle2 size={48} className="text-texts mb-4 opacity-50" strokeWidth={1} />
+            <h4 className="text-[17px] font-semibold text-textp tracking-tight">No alerts logged yet</h4>
+            <p className="text-[14px] text-texts max-w-[400px] mx-auto mt-2 leading-relaxed">
+              All connected servers are performing normally. No threshold violations recorded.
+            </p>
           </div>
         ) : (
-          <div style={styles.alertList}>
+          <div className="flex flex-col gap-3">
             {alerts.map((alert) => (
               <div
                 key={alert.id}
-                className="glass-card"
+                className={`glass-card p-5 flex flex-col gap-3 transition-all duration-200 ${alert.is_read ? 'opacity-60 hover:opacity-100' : 'border-l-2 border-l-borderg shadow-sm'}`}
                 style={{
-                  ...styles.alertCard,
-                  ...(alert.is_read ? styles.readCard : {}),
-                  borderLeft: `3px solid ${getSeverityColor(alert.severity)}`,
+                  borderLeftColor: alert.is_read ? 'var(--border-line)' : `var(--color-${alert.severity === 'critical' ? 'critical' : alert.severity === 'warning' ? 'warning' : 'online'})`
                 }}
               >
-                <div style={styles.alertMeta}>
-                  <div style={styles.serverInfo}>
-                    <span style={styles.serverIcon}>🖥️</span>
-                    <strong style={styles.serverName}>
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-2">
+                    {getSeverityIcon(alert.severity)}
+                    <strong className="text-[13px] font-semibold text-textp uppercase tracking-wider">
                       {alert.servers?.name || 'Server'}
                     </strong>
                   </div>
-                  <span style={styles.alertTime}>
+                  <span className="text-[11px] text-textm font-mono">
                     {new Date(alert.created_at).toLocaleString()}
                   </span>
                 </div>
 
-                <div style={styles.alertBody}>
-                  <p style={styles.alertMsg}>{alert.message}</p>
+                <div className="flex justify-between items-end gap-4 ml-6">
+                  <p className="text-[14px] text-texts leading-relaxed m-0 flex-1">
+                    {alert.message}
+                  </p>
                   {!alert.is_read && (
                     <button
                       onClick={() => handleMarkRead(alert.id)}
-                      style={styles.readBtn}
-                      className="btn-secondary"
+                      className="text-[12px] font-medium text-texts hover:text-textp transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded bg-hover outline-none border border-borderg"
                     >
-                      Mark Read
+                      <Check size={14} /> Acknowledge
                     </button>
                   )}
                 </div>
@@ -188,98 +193,3 @@ export default function AlertsPage() {
     </>
   );
 }
-
-const styles = {
-  actionHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '24px',
-  },
-  summaryText: {
-    fontSize: '14px',
-    color: 'var(--text-secondary)',
-  },
-  markAllBtn: {
-    padding: '8px 16px',
-    fontSize: '13px',
-  },
-  loadingPulse: {
-    fontSize: '16px',
-    color: 'var(--accent-cyan)',
-    animation: 'pulse-glow 1.5s infinite ease-in-out',
-    padding: '40px 0',
-  },
-  emptyCard: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '60px 20px',
-    textAlign: 'center' as const,
-  },
-  emptyIcon: {
-    fontSize: '48px',
-    marginBottom: '16px',
-  },
-  emptyText: {
-    color: 'var(--text-secondary)',
-    fontSize: '14px',
-    maxWidth: '360px',
-    margin: '8px auto 0 auto',
-    lineHeight: '1.6',
-  },
-  alertList: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '16px',
-  },
-  alertCard: {
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '12px',
-    transition: 'all 0.2s',
-  },
-  readCard: {
-    opacity: 0.6,
-  },
-  alertMeta: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  serverInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-  serverIcon: {
-    fontSize: '16px',
-  },
-  serverName: {
-    fontSize: '14px',
-    color: '#fff',
-    textTransform: 'uppercase' as const,
-  },
-  alertTime: {
-    fontSize: '12px',
-    color: 'var(--text-muted)',
-  },
-  alertBody: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    gap: '16px',
-  },
-  alertMsg: {
-    fontSize: '14px',
-    color: 'var(--text-secondary)',
-    lineHeight: '1.5',
-    flex: 1,
-  },
-  readBtn: {
-    padding: '6px 12px',
-    fontSize: '12px',
-  },
-};

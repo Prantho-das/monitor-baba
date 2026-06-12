@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import MetricGauge from './MetricGauge';
+import { Activity, HardDrive, Cpu, MemoryStick } from 'lucide-react';
 
 interface Server {
   id: string;
@@ -60,73 +60,100 @@ export default function ServerCard({
   const loadAvg = services?.loadAvg;
   const processCount = services?.processes;
 
+  const cpu = latestMetrics?.cpu_percent ?? 0;
+  const ram = latestMetrics?.ram_percent ?? 0;
+  const disk = latestMetrics?.disk_percent ?? 0;
+
   return (
-    <Link href={`/servers/${server.id}`} className="glass-card flex flex-col p-4 no-underline hover:-translate-y-1 hover:shadow-neon transition-all duration-300">
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex flex-col gap-0.5">
+    <Link href={`/servers/${server.id}`} className="glass-card flex flex-col p-5 no-underline hover:-translate-y-[2px] transition-all duration-200 group">
+      <div className="flex justify-between items-start mb-6">
+        <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <span
-              className={`pulse-indicator ${server.status}`}
-              style={{ backgroundColor: getStatusColor(server.status) }}
+              className={`w-2 h-2 rounded-full`}
+              style={{ 
+                backgroundColor: getStatusColor(server.status),
+                boxShadow: server.status !== 'offline' ? `0 0 8px ${getStatusColor(server.status)}` : 'none'
+              }}
             />
-            <h3 className="text-base font-semibold text-textp m-0">{server.name}</h3>
+            <h3 className="text-[15px] font-semibold text-textp m-0 tracking-tight group-hover:text-online transition-colors">{server.name}</h3>
           </div>
-          <span className="text-xs text-texts mt-0.5">{server.ip_address || server.hostname || 'No Host'}</span>
+          <span className="text-[13px] text-texts font-mono">{server.ip_address || server.hostname || 'No Host'}</span>
         </div>
-        <div className="text-right">
-           <span className="text-[11px] font-bold uppercase tracking-wider block" style={{ color: getStatusColor(server.status) }}>
+        <div className="text-right flex flex-col items-end">
+           <span className="text-[11px] font-bold uppercase tracking-wider bg-hover px-2 py-1 rounded" style={{ color: getStatusColor(server.status) }}>
               {server.status}
            </span>
-           <div className="text-[10px] text-textm mt-1">Sync: {syncText}</div>
+           <div className="text-[11px] text-textm mt-2 flex items-center gap-1">
+             <Activity size={12} />
+             {syncText}
+           </div>
         </div>
       </div>
 
-      <div className="flex justify-between items-center my-2 mb-4">
-        <div className="scale-85 origin-left">
-          <MetricGauge
-            value={latestMetrics?.cpu_percent ?? 0}
-            label="CPU"
-            color={
-              (latestMetrics?.cpu_percent ?? 0) > 85
-                ? 'var(--color-critical)'
-                : 'var(--accent-cyan)'
-            }
-          />
+      <div className="flex flex-col gap-4 my-2 mb-6">
+        {/* CPU Bar */}
+        <div className="flex flex-col gap-1.5">
+          <div className="flex justify-between items-center text-[12px]">
+            <div className="flex items-center gap-1.5 text-texts">
+              <Cpu size={14} />
+              <span className="font-medium uppercase tracking-wider text-[10px]">CPU</span>
+            </div>
+            <span className={`font-mono font-medium ${cpu > 85 ? 'text-critical' : 'text-textp'}`}>{cpu.toFixed(1)}%</span>
+          </div>
+          <div className="w-full h-1.5 bg-hover rounded-full overflow-hidden">
+            <div 
+              className={`h-full rounded-full transition-all duration-500 ${cpu > 85 ? 'bg-critical' : 'bg-online'}`} 
+              style={{ width: `${Math.min(cpu, 100)}%` }} 
+            />
+          </div>
         </div>
-        <div className="scale-85 origin-center">
-          <MetricGauge
-            value={latestMetrics?.ram_percent ?? 0}
-            label="RAM"
-            color={
-              (latestMetrics?.ram_percent ?? 0) > 85
-                ? 'var(--color-critical)'
-                : '#8b5cf6'
-            }
-          />
+
+        {/* RAM Bar */}
+        <div className="flex flex-col gap-1.5">
+          <div className="flex justify-between items-center text-[12px]">
+            <div className="flex items-center gap-1.5 text-texts">
+              <MemoryStick size={14} />
+              <span className="font-medium uppercase tracking-wider text-[10px]">RAM</span>
+            </div>
+            <span className={`font-mono font-medium ${ram > 85 ? 'text-critical' : 'text-textp'}`}>{ram.toFixed(1)}%</span>
+          </div>
+          <div className="w-full h-1.5 bg-hover rounded-full overflow-hidden">
+            <div 
+              className={`h-full rounded-full transition-all duration-500 ${ram > 85 ? 'bg-critical' : 'bg-online'}`} 
+              style={{ width: `${Math.min(ram, 100)}%` }} 
+            />
+          </div>
         </div>
-        <div className="scale-85 origin-right">
-          <MetricGauge
-            value={latestMetrics?.disk_percent ?? 0}
-            label="Disk"
-            color={
-              (latestMetrics?.disk_percent ?? 0) > 90
-                ? 'var(--color-critical)'
-                : 'var(--color-warning)'
-            }
-          />
+
+        {/* Disk Bar */}
+        <div className="flex flex-col gap-1.5">
+          <div className="flex justify-between items-center text-[12px]">
+            <div className="flex items-center gap-1.5 text-texts">
+              <HardDrive size={14} />
+              <span className="font-medium uppercase tracking-wider text-[10px]">Disk</span>
+            </div>
+            <span className={`font-mono font-medium ${disk > 90 ? 'text-critical' : 'text-textp'}`}>{disk.toFixed(1)}%</span>
+          </div>
+          <div className="w-full h-1.5 bg-hover rounded-full overflow-hidden">
+            <div 
+              className={`h-full rounded-full transition-all duration-500 ${disk > 90 ? 'bg-critical' : 'bg-warning'}`} 
+              style={{ width: `${Math.min(disk, 100)}%` }} 
+            />
+          </div>
         </div>
       </div>
 
-      <div className="mt-auto pt-3 border-t border-borderg flex justify-between text-[11px] bg-muted rounded p-2">
-        <div className="flex flex-col gap-0.5">
-          <span className="text-textm text-[9px] uppercase tracking-wider">Load (1m, 5m, 15m)</span>
-          <span className="text-textp font-semibold">
+      <div className="mt-auto pt-4 border-t border-borderg flex justify-between text-[12px]">
+        <div className="flex flex-col gap-1">
+          <span className="text-textm text-[10px] uppercase tracking-wider font-medium">Load Avg</span>
+          <span className="text-textp font-mono">
             {loadAvg ? loadAvg.join(', ') : 'N/A'}
           </span>
         </div>
-        <div className="flex flex-col gap-0.5 text-right">
-          <span className="text-textm text-[9px] uppercase tracking-wider">Processes</span>
-          <span className="text-textp font-semibold">
+        <div className="flex flex-col gap-1 text-right">
+          <span className="text-textm text-[10px] uppercase tracking-wider font-medium">Processes</span>
+          <span className="text-textp font-mono">
             {processCount !== undefined ? processCount : 'N/A'}
           </span>
         </div>
