@@ -18,7 +18,6 @@ export default function AdminDashboard() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      // Fetch global server stats
       const { count: serversCount } = await supabase
         .from('servers')
         .select('*', { count: 'exact', head: true });
@@ -28,7 +27,6 @@ export default function AdminDashboard() {
         .select('*', { count: 'exact', head: true })
         .eq('status', 'online');
 
-      // Fetch users from our secure admin API
       const res = await fetch('/api/admin/users', {
         headers: {
           'Authorization': `Bearer ${session.access_token}`
@@ -77,7 +75,6 @@ export default function AdminDashboard() {
       });
 
       if (res.ok) {
-        // Refresh data
         await loadData();
       } else {
         alert('Failed to update user status');
@@ -90,92 +87,94 @@ export default function AdminDashboard() {
   };
 
   if (loading) return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-      <div style={{ fontSize: '18px', color: 'var(--accent-cyan)', animation: 'pulse-glow 1.5s infinite ease-in-out' }}>
+    <div className="flex justify-center items-center h-[60vh]">
+      <div className="text-lg text-emerald-500 animate-[pulse-glow_1.5s_infinite_ease-in-out]">
         Loading Admin Powers...
       </div>
     </div>
   );
 
   return (
-    <div className="page-container" style={{ padding: '0', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: 'bold', background: 'linear-gradient(to right, #60a5fa, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+    <div className="max-w-6xl mx-auto w-full animate-[fadeIn_0.3s_ease-out]">
+      <div className="flex items-center gap-4 mb-8">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-ddaccent bg-clip-text text-transparent">
           Superadmin Command Center
         </h1>
-        <span style={{ padding: '4px 12px', background: 'rgba(96, 165, 250, 0.1)', color: '#60a5fa', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold', border: '1px solid rgba(96, 165, 250, 0.2)' }}>LIVE</span>
+        <span className="px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full text-xs font-bold tracking-wider">LIVE</span>
       </div>
       
-      <div style={styles.grid}>
-        <div className="glass-card" style={{ ...styles.card, borderTop: '4px solid #60a5fa' }}>
-          <h3 style={styles.cardTitle}>Total Users</h3>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
-            <p style={styles.cardValue}>{stats.totalUsers}</p>
-            <span style={{ color: '#60a5fa', fontSize: '14px', marginBottom: '6px' }}>Registered</span>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="glass-card border-t-4 border-t-blue-400">
+          <h3 className="text-xs text-ddmuted uppercase font-semibold tracking-wider mb-4">Total Users</h3>
+          <div className="flex items-end gap-3">
+            <p className="text-4xl font-extrabold leading-none">{stats.totalUsers}</p>
+            <span className="text-blue-400 text-sm mb-1">Registered</span>
           </div>
         </div>
-        <div className="glass-card" style={{ ...styles.card, borderTop: '4px solid #a78bfa' }}>
-          <h3 style={styles.cardTitle}>Total Servers</h3>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
-            <p style={styles.cardValue}>{stats.totalServers}</p>
-            <span style={{ color: '#a78bfa', fontSize: '14px', marginBottom: '6px' }}>Monitored</span>
+        <div className="glass-card border-t-4 border-t-ddaccent">
+          <h3 className="text-xs text-ddmuted uppercase font-semibold tracking-wider mb-4">Total Servers</h3>
+          <div className="flex items-end gap-3">
+            <p className="text-4xl font-extrabold leading-none">{stats.totalServers}</p>
+            <span className="text-ddaccent text-sm mb-1">Monitored</span>
           </div>
         </div>
-        <div className="glass-card" style={{ ...styles.card, borderTop: '4px solid var(--color-online)' }}>
-          <h3 style={styles.cardTitle}>Online Servers</h3>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
-            <p className="text-success" style={{ ...styles.cardValue, color: 'var(--color-online)' }}>
+        <div className="glass-card border-t-4 border-t-emerald-500">
+          <h3 className="text-xs text-ddmuted uppercase font-semibold tracking-wider mb-4">Online Servers</h3>
+          <div className="flex items-end gap-3">
+            <p className="text-4xl font-extrabold leading-none text-emerald-500">
               {stats.activeServers}
             </p>
-            <span style={{ color: 'var(--color-online)', fontSize: '14px', marginBottom: '6px' }}>Active Now</span>
+            <span className="text-emerald-500 text-sm mb-1">Active Now</span>
           </div>
         </div>
       </div>
       
-      <div className="glass-card" style={{ marginTop: '40px', padding: '0', overflow: 'hidden' }}>
-        <div style={{ padding: '24px', borderBottom: '1px solid var(--border-glass)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: '600' }}>User Management</h3>
-          <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{users.length} Users Found</div>
+      <div className="glass-card mt-10 p-0 overflow-hidden">
+        <div className="p-6 border-b border-ddhover flex justify-between items-center bg-ddcard">
+          <h3 className="text-lg font-semibold">User Management</h3>
+          <div className="text-sm text-ddmuted px-3 py-1 bg-ddhover rounded-full">{users.length} Users Found</div>
         </div>
         
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
             <thead>
-              <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
-                <th style={styles.th}>Email Address</th>
-                <th style={styles.th}>Joined Date</th>
-                <th style={styles.th}>Account Status</th>
-                <th style={styles.th} align="right">Actions</th>
+              <tr className="bg-ddbg/50">
+                <th className="p-4 text-xs text-ddmuted uppercase tracking-wider font-semibold">Email Address</th>
+                <th className="p-4 text-xs text-ddmuted uppercase tracking-wider font-semibold">Joined Date</th>
+                <th className="p-4 text-xs text-ddmuted uppercase tracking-wider font-semibold">Account Status</th>
+                <th className="p-4 text-xs text-ddmuted uppercase tracking-wider font-semibold text-right">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-ddhover">
               {users.map(user => (
-                <tr key={user.id} style={{ borderBottom: '1px solid var(--border-glass)', transition: 'background 0.2s' }}>
-                  <td style={styles.td}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-violet))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '14px' }}>
+                <tr key={user.id} className="hover:bg-ddhover/50 transition-colors">
+                  <td className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-ddaccent flex items-center justify-center font-bold text-sm shadow-sm">
                         {user.email.charAt(0).toUpperCase()}
                       </div>
-                      <span style={{ fontWeight: '500' }}>{user.email}</span>
+                      <span className="font-medium text-sm">{user.email}</span>
                     </div>
                   </td>
-                  <td style={{ ...styles.td, color: 'var(--text-muted)' }}>{new Date(user.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</td>
-                  <td style={styles.td}>
+                  <td className="p-4 text-sm text-ddmuted">
+                    {new Date(user.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                  </td>
+                  <td className="p-4">
                     {user.is_banned ? (
-                      <span style={{ color: 'var(--color-critical)', fontWeight: 'bold', background: 'rgba(239, 68, 68, 0.1)', padding: '4px 10px', borderRadius: '12px', fontSize: '12px' }}>BANNED</span>
+                      <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-red-500/10 text-red-400 border border-red-500/20">BANNED</span>
                     ) : (
-                      <span style={{ color: 'var(--color-online)', fontWeight: '500', background: 'rgba(16, 185, 129, 0.1)', padding: '4px 10px', borderRadius: '12px', fontSize: '12px' }}>ACTIVE</span>
+                      <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ACTIVE</span>
                     )}
                   </td>
-                  <td style={styles.td} align="right">
+                  <td className="p-4 text-right">
                     <button 
                       onClick={() => handleToggleBan(user.id, user.is_banned)}
                       disabled={processingId === user.id}
-                      style={{
-                        ...styles.actionBtn,
-                        background: user.is_banned ? 'rgba(255,255,255,0.1)' : 'var(--color-critical)',
-                        opacity: processingId === user.id ? 0.5 : 1
-                      }}
+                      className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all shadow-sm ${
+                        user.is_banned 
+                          ? 'bg-ddhover text-white hover:bg-ddcard border border-ddhover' 
+                          : 'bg-red-500/90 text-white hover:bg-red-600'
+                      } ${processingId === user.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       {processingId === user.id ? 'Processing...' : (user.is_banned ? 'Unban User' : 'Ban User')}
                     </button>
@@ -184,7 +183,7 @@ export default function AdminDashboard() {
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={4} style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  <td colSpan={4} className="p-10 text-center text-ddmuted">
                     No users found in the system.
                   </td>
                 </tr>
@@ -196,53 +195,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
-const styles = {
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '24px',
-  },
-  card: {
-    padding: '24px',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    justifyContent: 'space-between',
-  },
-  cardTitle: {
-    fontSize: '13px',
-    color: 'var(--text-muted)',
-    textTransform: 'uppercase' as const,
-    fontWeight: '600',
-    letterSpacing: '1px',
-    marginBottom: '16px',
-  },
-  cardValue: {
-    fontSize: '42px',
-    fontWeight: '800',
-    lineHeight: '1',
-  },
-  th: {
-    padding: '16px 24px',
-    fontSize: '12px',
-    color: 'var(--text-muted)',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.5px',
-    fontWeight: '600',
-  },
-  td: {
-    padding: '16px 24px',
-    fontSize: '14px',
-  },
-  actionBtn: {
-    border: 'none',
-    color: '#fff',
-    padding: '8px 16px',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontSize: '13px',
-    fontWeight: '600',
-    transition: 'all 0.2s',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-  }
-};

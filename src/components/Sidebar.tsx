@@ -20,38 +20,37 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="dashboard-sidebar">
-      <div className="sidebar-brand">
+    <aside className="fixed left-0 top-0 w-64 h-screen bg-ddsidebar border-r border-ddhover flex flex-col z-[100] transition-all duration-300">
+      <div className="p-6 flex items-center gap-3 border-b border-ddhover">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.png" alt="Monitor Baba Logo" className="sidebar-logo" />
-        <span className="sidebar-brand-text">Monitor-Baba</span>
+        <img src="/logo.png" alt="Monitor Baba Logo" className="w-9 h-9 rounded-lg shadow-sm" />
+        <span className="font-bold text-lg bg-gradient-to-r from-indigo-400 to-ddaccent bg-clip-text text-transparent tracking-tight">Monitor-Baba</span>
       </div>
 
-      <nav className="sidebar-nav">
+      <nav className="flex-1 p-4 flex flex-col gap-2 overflow-y-auto">
         {menuItems.map((item) => {
           const isActive = pathname === item.path || pathname.startsWith(item.path + '/');
           return (
             <Link
               key={item.path}
               href={item.path}
-              className={`sidebar-nav-item ${isActive ? 'active' : ''}`}
+              className={`relative flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${isActive ? 'bg-ddhover text-white shadow-sm' : 'text-ddmuted hover:bg-ddcard hover:text-ddtext'}`}
             >
-              <span className="sidebar-icon">{item.icon}</span>
-              <span className="sidebar-label">{item.name}</span>
-              {isActive && <div className="sidebar-active-indicator" />}
+              <span className="text-lg">{item.icon}</span>
+              <span>{item.name}</span>
+              {isActive && <div className="absolute left-0 top-1/4 h-1/2 w-1 bg-ddaccent rounded-r-md" />}
             </Link>
           );
         })}
-        {/* Mobile-only sign out link within nav */}
-        <button onClick={signOut} className="sidebar-nav-item mobile-signout">
-          <span className="sidebar-icon">🚪</span>
-          <span className="sidebar-label">Sign Out</span>
+        <button onClick={signOut} className="flex lg:hidden items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-all duration-200">
+          <span className="text-lg">🚪</span>
+          <span>Sign Out</span>
         </button>
       </nav>
 
-      <div className="sidebar-footer">
-        <button onClick={signOut} className="sidebar-logout-btn">
-          <span className="sidebar-icon">🚪</span> Sign Out
+      <div className="p-4 border-t border-ddhover">
+        <button onClick={signOut} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-all duration-200">
+          <span className="text-lg">🚪</span> Sign Out
         </button>
       </div>
     </aside>

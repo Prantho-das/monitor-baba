@@ -32,7 +32,7 @@ export default function RootLayout({
         <link rel="icon" href="/logo.png" />
         <link rel="apple-touch-icon" href="/logo.png" />
         {/* Google AdSense Script */}
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossOrigin="anonymous"></script>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8440441791918870" crossOrigin="anonymous"></script>
       </head>
       <body>
         <ServiceWorkerRegister />

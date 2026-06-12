@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 
-// TODO: Sir, ekhane apnar actual email add korben.
 export default function AdminLayout({
   children,
 }: {
@@ -27,7 +26,6 @@ export default function AdminLayout({
       if (isSuperAdmin) {
         setIsAuthorized(true);
       } else {
-        // Not an admin, redirect to regular dashboard
         router.replace('/dashboard');
       }
       setLoading(false);
@@ -38,53 +36,21 @@ export default function AdminLayout({
 
   if (loading || !isAuthorized) {
     return (
-      <div style={styles.loadingContainer}>
-        <div style={styles.loadingPulse}>Verifying Admin Access...</div>
+      <div className="flex items-center justify-center min-h-screen bg-ddbg">
+        <div className="text-lg text-emerald-500 animate-[pulse-glow_1.5s_infinite_ease-in-out]">Verifying Admin Access...</div>
       </div>
     );
   }
 
   return (
-    <div className="admin-container" style={{ minHeight: '100vh' }}>
-      <header style={styles.header}>
-        <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 'bold' }}>Mooonitooor Admin Panel</h2>
-        <button onClick={() => router.push('/dashboard')} style={styles.backBtn}>Back to Dashboard</button>
+    <div className="min-h-screen bg-ddbg text-ddtext flex flex-col">
+      <header className="px-6 py-4 border-b border-ddhover flex justify-between items-center bg-ddcard shadow-sm">
+        <h2 className="m-0 text-xl font-bold bg-gradient-to-r from-ddaccent to-indigo-500 bg-clip-text text-transparent">Mooonitooor Admin Panel</h2>
+        <button onClick={() => router.push('/dashboard')} className="btn-secondary">Back to Dashboard</button>
       </header>
-      <main style={{ padding: '24px' }}>
+      <main className="p-6 flex-1">
         {children}
       </main>
     </div>
   );
 }
-
-const styles = {
-  loadingContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '100vh',
-    background: 'var(--bg-main)',
-  },
-  loadingPulse: {
-    fontSize: '18px',
-    color: '#ff4757',
-    animation: 'pulse-glow 1.5s infinite ease-in-out',
-  },
-  header: {
-    padding: '16px 24px',
-    borderBottom: '1px solid var(--border-glass)',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  backBtn: {
-    background: 'var(--bg-card)',
-    border: '1px solid var(--border-glass)',
-    color: 'var(--text-primary)',
-    padding: '8px 16px',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '14px',
-    fontWeight: '500' as const,
-  }
-};
