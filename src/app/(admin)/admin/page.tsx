@@ -106,7 +106,7 @@ export default function AdminDashboard() {
         </div>
         <div style={styles.card}>
           <h3 style={styles.cardTitle}>Online Servers</h3>
-          <p style={styles.cardValue} className="text-success" style={{ color: 'var(--color-online)' }}>
+          <p className="text-success" style={{ ...styles.cardValue, color: 'var(--color-online)' }}>
             {stats.activeServers}
           </p>
         </div>
