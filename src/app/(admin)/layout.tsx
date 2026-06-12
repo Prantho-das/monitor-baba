@@ -45,9 +45,9 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="admin-container" style={{ background: '#0f172a', minHeight: '100vh', color: '#fff' }}>
+    <div className="admin-container" style={{ minHeight: '100vh' }}>
       <header style={styles.header}>
-        <h2>Mooonitooor Admin Panel</h2>
+        <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 'bold' }}>Mooonitooor Admin Panel</h2>
         <button onClick={() => router.push('/dashboard')} style={styles.backBtn}>Back to Dashboard</button>
       </header>
       <main style={{ padding: '24px' }}>
@@ -72,17 +72,19 @@ const styles = {
   },
   header: {
     padding: '16px 24px',
-    borderBottom: '1px solid rgba(255,255,255,0.1)',
+    borderBottom: '1px solid var(--border-glass)',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   backBtn: {
-    background: 'rgba(255,255,255,0.1)',
-    border: 'none',
-    color: '#fff',
+    background: 'var(--bg-card)',
+    border: '1px solid var(--border-glass)',
+    color: 'var(--text-primary)',
     padding: '8px 16px',
     borderRadius: '4px',
     cursor: 'pointer',
+    fontSize: '14px',
+    fontWeight: '500' as const,
   }
 };
