@@ -97,7 +97,7 @@ export default function AdminDashboard() {
   return (
     <div className="max-w-6xl mx-auto w-full animate-[fadeIn_0.3s_ease-out]">
       <div className="flex items-center gap-4 mb-8">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-ddaccent bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-accent bg-clip-text text-transparent">
           Superadmin Command Center
         </h1>
         <span className="px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full text-xs font-bold tracking-wider">LIVE</span>
@@ -105,21 +105,21 @@ export default function AdminDashboard() {
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="glass-card border-t-4 border-t-blue-400">
-          <h3 className="text-xs text-ddmuted uppercase font-semibold tracking-wider mb-4">Total Users</h3>
+          <h3 className="text-xs text-textm uppercase font-semibold tracking-wider mb-4">Total Users</h3>
           <div className="flex items-end gap-3">
             <p className="text-4xl font-extrabold leading-none">{stats.totalUsers}</p>
             <span className="text-blue-400 text-sm mb-1">Registered</span>
           </div>
         </div>
-        <div className="glass-card border-t-4 border-t-ddaccent">
-          <h3 className="text-xs text-ddmuted uppercase font-semibold tracking-wider mb-4">Total Servers</h3>
+        <div className="glass-card border-t-4 border-t-accent">
+          <h3 className="text-xs text-textm uppercase font-semibold tracking-wider mb-4">Total Servers</h3>
           <div className="flex items-end gap-3">
             <p className="text-4xl font-extrabold leading-none">{stats.totalServers}</p>
-            <span className="text-ddaccent text-sm mb-1">Monitored</span>
+            <span className="text-accent text-sm mb-1">Monitored</span>
           </div>
         </div>
         <div className="glass-card border-t-4 border-t-emerald-500">
-          <h3 className="text-xs text-ddmuted uppercase font-semibold tracking-wider mb-4">Online Servers</h3>
+          <h3 className="text-xs text-textm uppercase font-semibold tracking-wider mb-4">Online Servers</h3>
           <div className="flex items-end gap-3">
             <p className="text-4xl font-extrabold leading-none text-emerald-500">
               {stats.activeServers}
@@ -130,33 +130,33 @@ export default function AdminDashboard() {
       </div>
       
       <div className="glass-card mt-10 p-0 overflow-hidden">
-        <div className="p-6 border-b border-ddhover flex justify-between items-center bg-ddcard">
+        <div className="p-6 border-b border-hover flex justify-between items-center bg-card">
           <h3 className="text-lg font-semibold">User Management</h3>
-          <div className="text-sm text-ddmuted px-3 py-1 bg-ddhover rounded-full">{users.length} Users Found</div>
+          <div className="text-sm text-textm px-3 py-1 bg-hover rounded-full">{users.length} Users Found</div>
         </div>
         
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-ddbg/50">
-                <th className="p-4 text-xs text-ddmuted uppercase tracking-wider font-semibold">Email Address</th>
-                <th className="p-4 text-xs text-ddmuted uppercase tracking-wider font-semibold">Joined Date</th>
-                <th className="p-4 text-xs text-ddmuted uppercase tracking-wider font-semibold">Account Status</th>
-                <th className="p-4 text-xs text-ddmuted uppercase tracking-wider font-semibold text-right">Actions</th>
+              <tr className="bg-base/50">
+                <th className="p-4 text-xs text-textm uppercase tracking-wider font-semibold">Email Address</th>
+                <th className="p-4 text-xs text-textm uppercase tracking-wider font-semibold">Joined Date</th>
+                <th className="p-4 text-xs text-textm uppercase tracking-wider font-semibold">Account Status</th>
+                <th className="p-4 text-xs text-textm uppercase tracking-wider font-semibold text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-ddhover">
+            <tbody className="divide-y divide-hover">
               {users.map(user => (
-                <tr key={user.id} className="hover:bg-ddhover/50 transition-colors">
+                <tr key={user.id} className="hover:bg-hover/50 transition-colors">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-ddaccent flex items-center justify-center font-bold text-sm shadow-sm">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-accent flex items-center justify-center font-bold text-sm shadow-sm">
                         {user.email.charAt(0).toUpperCase()}
                       </div>
                       <span className="font-medium text-sm">{user.email}</span>
                     </div>
                   </td>
-                  <td className="p-4 text-sm text-ddmuted">
+                  <td className="p-4 text-sm text-textm">
                     {new Date(user.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                   </td>
                   <td className="p-4">
@@ -172,7 +172,7 @@ export default function AdminDashboard() {
                       disabled={processingId === user.id}
                       className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all shadow-sm ${
                         user.is_banned 
-                          ? 'bg-ddhover text-white hover:bg-ddcard border border-ddhover' 
+                          ? 'bg-hover text-white hover:bg-card border border-hover' 
                           : 'bg-red-500/90 text-white hover:bg-red-600'
                       } ${processingId === user.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
@@ -183,7 +183,7 @@ export default function AdminDashboard() {
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="p-10 text-center text-ddmuted">
+                  <td colSpan={4} className="p-10 text-center text-textm">
                     No users found in the system.
                   </td>
                 </tr>

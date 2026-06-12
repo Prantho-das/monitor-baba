@@ -112,57 +112,61 @@ export default function DashboardPage() {
 
       <div className="page-container">
         {loading ? (
-          <div style={styles.loadingPulse}>Loading dashboard overview...</div>
+          <div className="text-base text-accent animate-[pulse-glow_1.5s_infinite_ease-in-out] py-10">
+            Loading dashboard overview...
+          </div>
         ) : (
-          <div style={styles.content}>
+          <div className="flex flex-col gap-8">
             {/* Status Statistics Cards */}
-            <div style={styles.statsGrid}>
-              <div className="glass-card" style={styles.statCard}>
-                <span style={styles.statIcon}>🖥️</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              <div className="glass-card flex items-center gap-5 p-5">
+                <span className="text-3xl">🖥️</span>
                 <div>
-                  <h4 style={styles.statTitle}>Total Servers</h4>
-                  <span style={styles.statNumber}>{servers.length}</span>
+                  <h4 className="text-xs text-texts uppercase font-medium mb-1">Total Servers</h4>
+                  <span className="text-3xl font-bold text-textp">{servers.length}</span>
                 </div>
               </div>
-              <div className="glass-card" style={{ ...styles.statCard, borderLeft: '3px solid var(--color-online)' }}>
-                <span style={styles.statIcon}>🟢</span>
+              <div className="glass-card flex items-center gap-5 p-5 border-l-4 border-l-emerald-500">
+                <span className="text-3xl">🟢</span>
                 <div>
-                  <h4 style={styles.statTitle}>Online</h4>
-                  <span style={styles.statNumber}>{onlineCount}</span>
+                  <h4 className="text-xs text-texts uppercase font-medium mb-1">Online</h4>
+                  <span className="text-3xl font-bold text-textp">{onlineCount}</span>
                 </div>
               </div>
-              <div className="glass-card" style={{ ...styles.statCard, borderLeft: '3px solid var(--color-warning)' }}>
-                <span style={styles.statIcon}>🟡</span>
+              <div className="glass-card flex items-center gap-5 p-5 border-l-4 border-l-amber-500">
+                <span className="text-3xl">🟡</span>
                 <div>
-                  <h4 style={styles.statTitle}>Warning</h4>
-                  <span style={styles.statNumber}>{warningCount}</span>
+                  <h4 className="text-xs text-texts uppercase font-medium mb-1">Warning</h4>
+                  <span className="text-3xl font-bold text-textp">{warningCount}</span>
                 </div>
               </div>
-              <div className="glass-card" style={{ ...styles.statCard, borderLeft: '3px solid var(--text-muted)' }}>
-                <span style={styles.statIcon}>🔴</span>
+              <div className="glass-card flex items-center gap-5 p-5 border-l-4 border-l-gray-500">
+                <span className="text-3xl">🔴</span>
                 <div>
-                  <h4 style={styles.statTitle}>Offline</h4>
-                  <span style={styles.statNumber}>{offlineCount}</span>
+                  <h4 className="text-xs text-texts uppercase font-medium mb-1">Offline</h4>
+                  <span className="text-3xl font-bold text-textp">{offlineCount}</span>
                 </div>
               </div>
             </div>
 
             {/* Split dashboard into Server Grid and Recent Alerts */}
-            <div style={styles.mainGrid}>
-              <div style={styles.leftCol}>
-                <div style={styles.sectionHeader}>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 flex flex-col gap-5">
+                <div className="flex justify-between items-center text-base font-semibold text-textp">
                   <h3>Active Infrastructure</h3>
-                  <Link href="/servers" style={styles.link}>
+                  <Link href="/servers" className="text-[13px] text-accent font-medium hover:underline">
                     Manage Servers →
                   </Link>
                 </div>
 
                 {servers.length === 0 ? (
-                  <div className="glass-card" style={styles.emptyCard}>
-                    <span style={styles.emptyIcon}>🔌</span>
-                    <h4>No servers registered yet</h4>
-                    <p style={styles.emptyText}>Register your first server to start monitoring its CPU, RAM and Disk status.</p>
-                    <Link href="/servers" className="btn-primary" style={{ marginTop: '16px' }}>
+                  <div className="glass-card flex flex-col items-center justify-center py-16 px-5 text-center">
+                    <span className="text-5xl mb-4">🔌</span>
+                    <h4 className="text-lg font-medium text-textp">No servers registered yet</h4>
+                    <p className="text-sm text-texts max-w-[360px] mx-auto mt-2 leading-relaxed">
+                      Register your first server to start monitoring its CPU, RAM and Disk status.
+                    </p>
+                    <Link href="/servers" className="btn-primary mt-4">
                       Add Server
                     </Link>
                   </div>
@@ -179,31 +183,31 @@ export default function DashboardPage() {
                 )}
               </div>
 
-              <div style={styles.rightCol}>
-                <div style={styles.sectionHeader}>
+              <div className="flex flex-col gap-5">
+                <div className="flex justify-between items-center text-base font-semibold text-textp">
                   <h3>Recent Alerts</h3>
-                  <Link href="/alerts" style={styles.link}>
+                  <Link href="/alerts" className="text-[13px] text-accent font-medium hover:underline">
                     Alert Log →
                   </Link>
                 </div>
 
-                <div className="glass-card" style={styles.alertsPanel}>
+                <div className="glass-card p-5 h-[420px] overflow-y-auto">
                   {recentAlerts.length === 0 ? (
-                    <div style={styles.emptyAlerts}>
+                    <div className="flex items-center justify-center h-full text-texts gap-2 text-sm">
                       <span>🟢</span> All systems operational. No active alerts.
                     </div>
                   ) : (
-                    <div style={styles.alertList}>
+                    <div className="flex flex-col gap-4">
                       {recentAlerts.map((alert) => (
-                        <div key={alert.id} style={styles.alertRow}>
-                          <div style={styles.alertMeta}>
-                            <span style={styles.alertDot} />
-                            <strong style={styles.alertServerName}>
+                        <div key={alert.id} className="pb-4 border-b border-borderg flex flex-col gap-1.5 last:border-0 last:pb-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-critical shadow-neon" />
+                            <strong className="text-xs text-textp uppercase tracking-wider">
                               {alert.servers?.name || 'Server'}
                             </strong>
                           </div>
-                          <p style={styles.alertMessage}>{alert.message}</p>
-                          <span style={styles.alertTime}>
+                          <p className="text-[13px] text-texts leading-relaxed m-0">{alert.message}</p>
+                          <span className="text-[10px] text-textm self-end">
                             {new Date(alert.created_at).toLocaleString()}
                           </span>
                         </div>
@@ -218,156 +222,4 @@ export default function DashboardPage() {
       </div>
     </>
   );
-}
-
-const styles = {
-  content: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '32px',
-  },
-  statsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '20px',
-  },
-  statCard: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '20px',
-    padding: '20px',
-  },
-  statIcon: {
-    fontSize: '28px',
-  },
-  statTitle: {
-    fontSize: '12px',
-    color: 'var(--text-secondary)',
-    textTransform: 'uppercase' as const,
-    fontWeight: '500',
-    marginBottom: '4px',
-  },
-  statNumber: {
-    fontSize: '28px',
-    fontWeight: '700',
-  },
-  mainGrid: {
-    display: 'grid',
-    gridTemplateColumns: '2fr 1fr',
-    gap: '32px',
-  },
-  leftCol: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '20px',
-  },
-  rightCol: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '20px',
-  },
-  sectionHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    fontSize: '16px',
-    fontWeight: '600',
-  },
-  link: {
-    fontSize: '13px',
-    color: 'var(--accent-cyan)',
-    fontWeight: '500',
-  },
-  alertsPanel: {
-    padding: '20px',
-    height: '420px',
-    overflowY: 'auto' as const,
-  },
-  emptyAlerts: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%',
-    color: 'var(--text-secondary)',
-    gap: '8px',
-    fontSize: '14px',
-  },
-  alertList: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '16px',
-  },
-  alertRow: {
-    paddingBottom: '16px',
-    borderBottom: '1px solid var(--border-glass)',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '6px',
-  },
-  alertMeta: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-  },
-  alertDot: {
-    width: '6px',
-    height: '6px',
-    borderRadius: '50%',
-    background: 'var(--color-critical)',
-    boxShadow: 'var(--glow-critical)',
-  },
-  alertServerName: {
-    fontSize: '12px',
-    color: 'var(--text-primary)',
-    textTransform: 'uppercase' as const,
-  },
-  alertMessage: {
-    fontSize: '13px',
-    color: 'var(--text-secondary)',
-    lineHeight: '1.4',
-  },
-  alertTime: {
-    fontSize: '10px',
-    color: 'var(--text-muted)',
-    alignSelf: 'flex-end',
-  },
-  emptyCard: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '60px 20px',
-    textAlign: 'center' as const,
-  },
-  emptyIcon: {
-    fontSize: '48px',
-    marginBottom: '16px',
-  },
-  emptyText: {
-    color: 'var(--text-secondary)',
-    fontSize: '14px',
-    maxWidth: '360px',
-    margin: '8px auto 0 auto',
-    lineHeight: '1.6',
-  },
-  loadingPulse: {
-    fontSize: '16px',
-    color: 'var(--accent-cyan)',
-    animation: 'pulse-glow 1.5s infinite ease-in-out',
-    padding: '40px 0',
-  },
-};
-
-// Handle responsive resizing using media query in JS context for split grid
-if (typeof window !== 'undefined') {
-  const mediaQuery = window.matchMedia('(max-width: 1024px)');
-  const handleTabletChange = (e: MediaQueryListEvent | MediaQueryList) => {
-    if (e.matches) {
-      styles.mainGrid.gridTemplateColumns = '1fr';
-    } else {
-      styles.mainGrid.gridTemplateColumns = '2fr 1fr';
-    }
-  };
-  mediaQuery.addEventListener('change', handleTabletChange);
-  handleTabletChange(mediaQuery);
 }

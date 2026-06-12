@@ -13,33 +13,20 @@ export default function DashboardLayout({
 
   if (loading || !user) {
     return (
-      <div style={styles.loadingContainer}>
-        <div style={styles.loadingPulse}>Initialising Dashboard...</div>
+      <div className="min-h-screen flex items-center justify-center bg-base">
+        <div className="text-lg text-accent animate-[pulse-glow_1.5s_infinite_ease-in-out]">
+          Initialising Dashboard...
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="dashboard-container">
+    <div className="flex min-h-screen bg-base text-textp">
       <Sidebar />
-      <main className="dashboard-main-content">
+      <main className="flex-1 ml-64 min-h-screen relative overflow-x-hidden flex flex-col">
         {children}
       </main>
     </div>
   );
 }
-
-const styles = {
-  loadingContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '100vh',
-    background: 'var(--bg-main)',
-  },
-  loadingPulse: {
-    fontSize: '18px',
-    color: 'var(--accent-cyan)',
-    animation: 'pulse-glow 1.5s infinite ease-in-out',
-  },
-};

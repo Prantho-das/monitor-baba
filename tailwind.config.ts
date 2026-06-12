@@ -1,31 +1,37 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: ['class', '[data-theme="dark"]'],
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        ddbg: '#0b0f19',
-        ddsidebar: '#111827',
-        ddcard: '#1f2937',
-        ddhover: '#374151',
-        ddaccent: '#8b5cf6',
-        ddaccenthover: '#7c3aed',
-        ddtext: '#f9fafb',
-        ddmuted: '#9ca3af',
+        // Light mode variables
+        base: 'var(--bg-main)',
+        sidebar: 'var(--bg-sidebar)',
+        card: 'var(--bg-card)',
+        hover: 'var(--bg-card-hover)',
+        muted: 'var(--bg-muted)',
+        borderg: 'var(--border-glass)',
+        accent: 'var(--accent-cyan)',
+        online: 'var(--color-online)',
+        warning: 'var(--color-warning)',
+        critical: 'var(--color-critical)',
+        textp: 'var(--text-primary)',
+        texts: 'var(--text-secondary)',
+        textm: 'var(--text-muted)',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
         mono: ['Roboto Mono', 'monospace'],
       },
       boxShadow: {
-        'dd': '0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2)',
-        'dd-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3)',
+        'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
+        'neon': '0 0 10px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3)',
       }
     },
   },

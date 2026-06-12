@@ -36,16 +36,16 @@ export default function AdminLayout({
 
   if (loading || !isAuthorized) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-ddbg">
+      <div className="flex items-center justify-center min-h-screen bg-base">
         <div className="text-lg text-emerald-500 animate-[pulse-glow_1.5s_infinite_ease-in-out]">Verifying Admin Access...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-ddbg text-ddtext flex flex-col">
-      <header className="px-6 py-4 border-b border-ddhover flex justify-between items-center bg-ddcard shadow-sm">
-        <h2 className="m-0 text-xl font-bold bg-gradient-to-r from-ddaccent to-indigo-500 bg-clip-text text-transparent">Mooonitooor Admin Panel</h2>
+    <div className="min-h-screen bg-base text-textp flex flex-col">
+      <header className="px-6 py-4 border-b border-hover flex justify-between items-center bg-card shadow-sm">
+        <h2 className="m-0 text-xl font-bold bg-gradient-to-r from-accent to-indigo-500 bg-clip-text text-transparent">Mooonitooor Admin Panel</h2>
         <button onClick={() => router.push('/dashboard')} className="btn-secondary">Back to Dashboard</button>
       </header>
       <main className="p-6 flex-1">

@@ -53,7 +53,6 @@ export default function TopBar({ title }: { title: string }) {
         { event: 'INSERT', schema: 'public', table: 'alerts' },
         (payload) => {
           console.log('Realtime alert received:', payload.new);
-          // Reload alerts
           fetchUnreadAlerts();
         }
       )
@@ -100,59 +99,61 @@ export default function TopBar({ title }: { title: string }) {
   };
 
   return (
-    <header style={styles.topbar}>
-      <h2 style={styles.title}>{title}</h2>
+    <header className="h-[70px] flex items-center justify-between px-10 border-b border-borderg sticky top-0 bg-sidebar/80 backdrop-blur-md z-50 transition-colors duration-300">
+      <h2 className="text-xl font-semibold text-textp">{title}</h2>
 
-      <div style={styles.actions} ref={dropdownRef}>
+      <div className="flex items-center gap-5" ref={dropdownRef}>
         <button
           onClick={toggleTheme}
-          style={styles.themeBtn}
+          className="bg-transparent border-none text-xl cursor-pointer text-textp p-2 rounded-lg hover:bg-hover transition-colors flex items-center"
           title="Toggle Theme"
         >
           {theme === 'dark' ? '☀️' : '🌙'}
         </button>
 
-        <div style={styles.notificationWrapper}>
+        <div className="relative">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            style={styles.bellBtn}
+            className="bg-transparent border-none text-xl cursor-pointer text-textp p-2 rounded-lg hover:bg-hover transition-colors flex items-center relative"
           >
             <span>🔔</span>
             {alerts.length > 0 && (
-              <span style={styles.badge}>{alerts.length}</span>
+              <span className="absolute top-0 right-0 bg-critical text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] text-center shadow-sm">
+                {alerts.length}
+              </span>
             )}
           </button>
 
           {dropdownOpen && (
-            <div style={styles.dropdown} className="glass-card">
-              <div style={styles.dropdownHeader}>
-                <span style={styles.dropdownTitle}>Alerts</span>
+            <div className="absolute right-0 top-12 w-80 pt-4 pb-0 bg-card border border-borderg rounded-xl shadow-glass animate-[fadeIn_0.2s_ease-out] overflow-hidden z-50">
+              <div className="flex justify-between items-center px-4 pb-3 border-b border-borderg">
+                <span className="font-semibold text-sm text-textp">Alerts</span>
                 {alerts.length > 0 && (
-                  <button onClick={markAllRead} style={styles.clearBtn}>
+                  <button onClick={markAllRead} className="bg-transparent border-none text-accent text-xs cursor-pointer font-medium hover:text-blue-500">
                     Mark all read
                   </button>
                 )}
               </div>
 
-              <div style={styles.alertList}>
+              <div className="max-h-[280px] overflow-y-auto">
                 {alerts.length === 0 ? (
-                  <div style={styles.emptyAlerts}>No unread alerts</div>
+                  <div className="p-6 text-center text-texts text-sm">No unread alerts</div>
                 ) : (
                   alerts.slice(0, 5).map((alert) => (
                     <Link
                       key={alert.id}
                       href="/alerts"
                       onClick={() => setDropdownOpen(false)}
-                      style={styles.alertItem}
+                      className="flex flex-col p-3 border-b border-borderg hover:bg-hover transition-colors cursor-pointer"
                     >
-                      <div style={styles.alertMeta}>
-                        <span style={styles.alertDot} />
-                        <span style={styles.alertServer}>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-critical shadow-neon" />
+                        <span className="text-[11px] font-bold text-textp uppercase">
                           {alert.servers?.name || 'Server'}
                         </span>
                       </div>
-                      <p style={styles.alertMsg}>{alert.message}</p>
-                      <span style={styles.alertTime}>
+                      <p className="text-[13px] text-texts leading-relaxed">{alert.message}</p>
+                      <span className="text-[10px] text-textm mt-1 self-end">
                         {new Date(alert.created_at).toLocaleTimeString([], {
                           hour: '2-digit',
                           minute: '2-digit',
@@ -163,11 +164,11 @@ export default function TopBar({ title }: { title: string }) {
                 )}
               </div>
 
-              <div style={styles.dropdownFooter}>
+              <div className="p-3 text-center border-t border-borderg bg-muted">
                 <Link
                   href="/alerts"
                   onClick={() => setDropdownOpen(false)}
-                  style={styles.viewAll}
+                  className="text-[13px] text-textp font-medium hover:text-accent transition-colors"
                 >
                   View All Alerts
                 </Link>
@@ -179,156 +180,3 @@ export default function TopBar({ title }: { title: string }) {
     </header>
   );
 }
-
-const styles = {
-  topbar: {
-    height: '70px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '0 40px',
-    borderBottom: '1px solid var(--border-glass)',
-    position: 'sticky' as const,
-    top: 0,
-    background: 'var(--bg-sidebar)',
-    zIndex: 90,
-  },
-  title: {
-    fontSize: '20px',
-    fontWeight: '600',
-  },
-  actions: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '20px',
-  },
-  notificationWrapper: {
-    position: 'relative' as const,
-  },
-  bellBtn: {
-    background: 'transparent',
-    border: 'none',
-    fontSize: '20px',
-    cursor: 'pointer',
-    position: 'relative' as const,
-    color: 'var(--text-primary)',
-    padding: '6px',
-    borderRadius: '8px',
-    transition: 'background 0.2s',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  themeBtn: {
-    background: 'transparent',
-    border: 'none',
-    fontSize: '20px',
-    cursor: 'pointer',
-    color: 'var(--text-primary)',
-    padding: '6px',
-    borderRadius: '8px',
-    transition: 'background 0.2s',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  badge: {
-    position: 'absolute' as const,
-    top: '2px',
-    right: '2px',
-    background: 'var(--color-critical)',
-    color: '#fff',
-    fontSize: '10px',
-    fontWeight: '700',
-    borderRadius: '10px',
-    padding: '2px 6px',
-    minWidth: '18px',
-    textAlign: 'center' as const,
-    boxShadow: 'var(--shadow-sm)',
-  },
-  dropdown: {
-    position: 'absolute' as const,
-    right: 0,
-    top: '40px',
-    width: '320px',
-    padding: '16px 0 0 0',
-    boxShadow: 'var(--shadow-md)',
-    animation: 'fadeIn 0.2s ease-out',
-    overflow: 'hidden',
-  },
-  dropdownHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '0 16px 12px 16px',
-    borderBottom: '1px solid var(--border-glass)',
-  },
-  dropdownTitle: {
-    fontWeight: '600',
-    fontSize: '14px',
-  },
-  clearBtn: {
-    background: 'transparent',
-    border: 'none',
-    color: 'var(--accent-cyan)',
-    fontSize: '12px',
-    cursor: 'pointer',
-    fontWeight: '500',
-  },
-  alertList: {
-    maxHeight: '280px',
-    overflowY: 'auto' as const,
-  },
-  emptyAlerts: {
-    padding: '24px',
-    textAlign: 'center' as const,
-    color: 'var(--text-secondary)',
-    fontSize: '14px',
-  },
-  alertItem: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    padding: '12px 16px',
-    borderBottom: '1px solid var(--border-glass)',
-    transition: 'background 0.2s',
-    cursor: 'pointer',
-  },
-  alertMeta: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    marginBottom: '4px',
-  },
-  alertDot: {
-    width: '6px',
-    height: '6px',
-    borderRadius: '50%',
-    background: 'var(--color-critical)',
-  },
-  alertServer: {
-    fontSize: '11px',
-    fontWeight: '700',
-    color: 'var(--text-primary)',
-    textTransform: 'uppercase' as const,
-  },
-  alertMsg: {
-    fontSize: '13px',
-    color: 'var(--text-secondary)',
-    lineHeight: '1.4',
-  },
-  alertTime: {
-    fontSize: '10px',
-    color: 'var(--text-muted)',
-    marginTop: '4px',
-    alignSelf: 'flex-end',
-  },
-  dropdownFooter: {
-    padding: '12px',
-    textAlign: 'center' as const,
-    borderTop: '1px solid var(--border-glass)',
-    background: 'var(--bg-muted)',
-  },
-  viewAll: {
-    fontSize: '13px',
-    color: 'var(--text-primary)',
-    fontWeight: '500',
-  },
-};

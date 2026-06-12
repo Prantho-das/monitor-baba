@@ -3,33 +3,70 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --bg-main: #f4f5f7;
+    --bg-sidebar: #ffffff;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f9fafb;
+    --bg-muted: #f3f4f6;
+    --border-glass: #e5e7eb;
+    
+    --accent-cyan: #2563eb;
+    --color-online: #10b981;
+    --color-warning: #f59e0b;
+    --color-critical: #ef4444;
+    
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #9ca3af;
+  }
+
+  [data-theme='dark'] {
+    --bg-main: #0b0f19;
+    --bg-sidebar: #111827;
+    --bg-card: #1f2937;
+    --bg-card-hover: #374151;
+    --bg-muted: #111827;
+    --border-glass: #374151;
+    
+    --accent-cyan: #3b82f6;
+    --color-online: #10b981;
+    --color-warning: #fbbf24;
+    --color-critical: #ef4444;
+    
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-muted: #6b7280;
+  }
+
   body {
-    @apply bg-ddbg text-ddtext font-sans antialiased;
+    @apply bg-base text-textp font-sans antialiased transition-colors duration-300;
   }
 }
 
 @layer components {
+  /* Legacy Glass Card */
   .glass-card {
-    @apply bg-ddcard border border-ddhover rounded-xl p-6 shadow-dd transition-all duration-300;
+    @apply bg-card border border-borderg rounded-xl p-6 shadow-sm transition-all duration-300;
   }
   .glass-card:hover {
-    @apply bg-ddhover border-gray-600 shadow-dd-hover -translate-y-1;
-  }
-  
-  .btn-primary {
-    @apply bg-ddaccent hover:bg-ddaccenthover text-white font-medium py-2 px-4 rounded-lg shadow-dd transition-all duration-200 inline-flex items-center justify-center gap-2 text-sm;
-  }
-  
-  .btn-secondary {
-    @apply bg-ddcard hover:bg-ddhover border border-ddhover text-ddtext font-medium py-2 px-4 rounded-lg shadow-dd transition-all duration-200 inline-flex items-center justify-center gap-2 text-sm;
+    @apply bg-hover border-accent/50 shadow-md -translate-y-1;
   }
   
   .glass-input {
-    @apply bg-ddbg border border-ddhover rounded-lg text-ddtext px-4 py-2 text-sm focus:outline-none focus:border-ddaccent focus:ring-2 focus:ring-ddaccent/30 transition-all duration-200;
+    @apply bg-base border border-borderg rounded-lg text-textp px-4 py-2 text-sm focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30 transition-all duration-200;
+  }
+
+  .btn-primary {
+    @apply bg-accent text-white font-medium py-2 px-4 rounded-lg shadow-sm hover:shadow-neon hover:bg-blue-600 transition-all duration-300 inline-flex items-center justify-center gap-2 text-sm;
+  }
+  
+  .btn-secondary {
+    @apply bg-card hover:bg-hover border border-borderg text-textp font-medium py-2 px-4 rounded-lg shadow-sm transition-all duration-200 inline-flex items-center justify-center gap-2 text-sm;
   }
 }
 
-/* Animations for active/online status */
+/* Animations */
 @keyframes pulse-glow {
   0%, 100% { opacity: 0.6; }
   50% { opacity: 1; }
@@ -51,4 +88,18 @@
 
 .pulse-indicator.offline {
   @apply bg-gray-500;
+}
+
+/* Legacy Utilities missing from globals */
+.dashboard-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-6;
+}
+
+.page-container {
+  @apply p-6 max-w-7xl mx-auto w-full animate-[fadeIn_0.3s_ease-out];
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }

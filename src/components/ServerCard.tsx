@@ -59,31 +59,30 @@ export default function ServerCard({
 
   const loadAvg = services?.loadAvg;
   const processCount = services?.processes;
-  const daemons = services?.daemons;
 
   return (
-    <Link href={`/servers/${server.id}`} className="glass-card" style={styles.card}>
-      <div style={styles.header}>
-        <div style={styles.headerInfo}>
-          <div style={styles.statusGroup}>
+    <Link href={`/servers/${server.id}`} className="glass-card flex flex-col p-4 no-underline hover:-translate-y-1 hover:shadow-neon transition-all duration-300">
+      <div className="flex justify-between items-start mb-4">
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-2">
             <span
               className={`pulse-indicator ${server.status}`}
               style={{ backgroundColor: getStatusColor(server.status) }}
             />
-            <h3 style={styles.name}>{server.name}</h3>
+            <h3 className="text-base font-semibold text-textp m-0">{server.name}</h3>
           </div>
-          <span style={styles.hostname}>{server.ip_address || server.hostname || 'No Host'}</span>
+          <span className="text-xs text-texts mt-0.5">{server.ip_address || server.hostname || 'No Host'}</span>
         </div>
-        <div style={{ textAlign: 'right' }}>
-           <span style={{ ...styles.statusText, color: getStatusColor(server.status) }}>
+        <div className="text-right">
+           <span className="text-[11px] font-bold uppercase tracking-wider block" style={{ color: getStatusColor(server.status) }}>
               {server.status}
            </span>
-           <div style={styles.syncText}>Sync: {syncText}</div>
+           <div className="text-[10px] text-textm mt-1">Sync: {syncText}</div>
         </div>
       </div>
 
-      <div style={styles.gaugeGrid}>
-        <div style={styles.gaugeWrapper}>
+      <div className="flex justify-between items-center my-2 mb-4">
+        <div className="scale-85 origin-left">
           <MetricGauge
             value={latestMetrics?.cpu_percent ?? 0}
             label="CPU"
@@ -94,18 +93,18 @@ export default function ServerCard({
             }
           />
         </div>
-        <div style={styles.gaugeWrapper}>
+        <div className="scale-85 origin-center">
           <MetricGauge
             value={latestMetrics?.ram_percent ?? 0}
             label="RAM"
             color={
               (latestMetrics?.ram_percent ?? 0) > 85
                 ? 'var(--color-critical)'
-                : 'var(--accent-violet)'
+                : '#8b5cf6'
             }
           />
         </div>
-        <div style={styles.gaugeWrapper}>
+        <div className="scale-85 origin-right">
           <MetricGauge
             value={latestMetrics?.disk_percent ?? 0}
             label="Disk"
@@ -118,16 +117,16 @@ export default function ServerCard({
         </div>
       </div>
 
-      <div style={styles.devopsBar}>
-        <div style={styles.devopsItem}>
-          <span style={styles.devopsLabel}>Load (1m, 5m, 15m)</span>
-          <span style={styles.devopsValue}>
+      <div className="mt-auto pt-3 border-t border-borderg flex justify-between text-[11px] bg-muted/50 rounded p-2">
+        <div className="flex flex-col gap-0.5">
+          <span className="text-textm text-[9px] uppercase tracking-wider">Load (1m, 5m, 15m)</span>
+          <span className="text-textp font-semibold">
             {loadAvg ? loadAvg.join(', ') : 'N/A'}
           </span>
         </div>
-        <div style={styles.devopsItem}>
-          <span style={styles.devopsLabel}>Processes</span>
-          <span style={styles.devopsValue}>
+        <div className="flex flex-col gap-0.5 text-right">
+          <span className="text-textm text-[9px] uppercase tracking-wider">Processes</span>
+          <span className="text-textp font-semibold">
             {processCount !== undefined ? processCount : 'N/A'}
           </span>
         </div>
@@ -135,96 +134,3 @@ export default function ServerCard({
     </Link>
   );
 }
-
-const styles = {
-  card: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    cursor: 'pointer',
-    textDecoration: 'none',
-    padding: '16px', // Compact padding
-    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-  },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '16px',
-  },
-  headerInfo: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '2px',
-  },
-  name: {
-    fontSize: '16px',
-    fontWeight: '600',
-    color: 'var(--text-primary)',
-    margin: 0,
-  },
-  hostname: {
-    fontSize: '12px',
-    color: 'var(--text-secondary)',
-    marginTop: '2px',
-  },
-  statusGroup: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-  statusText: {
-    fontSize: '11px',
-    fontWeight: '700',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.5px',
-    display: 'block',
-  },
-  syncText: {
-    fontSize: '10px',
-    color: 'var(--text-muted)',
-    marginTop: '4px',
-  },
-  gaugeGrid: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    margin: '8px 0 16px 0',
-  },
-  gaugeWrapper: {
-    transform: 'scale(0.85)', // Make gauges smaller
-  },
-  servicesRow: {
-    display: 'flex',
-    gap: '6px',
-    overflowX: 'auto' as const,
-    paddingBottom: '8px',
-    marginBottom: '8px',
-    scrollbarWidth: 'none' as const,
-    whiteSpace: 'nowrap' as const,
-  },
-  devopsBar: {
-    marginTop: 'auto',
-    paddingTop: '12px',
-    borderTop: '1px solid var(--border-glass)',
-    display: 'flex',
-    justifyContent: 'space-between',
-    fontSize: '11px',
-    background: 'var(--bg-muted)',
-    borderRadius: '4px',
-    padding: '8px 12px',
-  },
-  devopsItem: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '2px',
-  },
-  devopsLabel: {
-    color: 'var(--text-muted)',
-    fontSize: '9px',
-    textTransform: 'uppercase' as const,
-  },
-  devopsValue: {
-    color: 'var(--text-primary)',
-    fontWeight: '600',
-  },
-};
