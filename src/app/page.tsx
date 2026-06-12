@@ -1,8 +1,12 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Activity, Bell, LayoutDashboard } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function LandingPage() {
+  const { user } = useAuth(false);
   return (
     <div className="min-h-screen bg-base text-textp font-sans relative overflow-hidden transition-colors duration-200">
       {/* Subtle grid background */}
@@ -17,12 +21,20 @@ export default function LandingPage() {
           <span className="text-xl font-bold tracking-tight">Monitor-Baba</span>
         </div>
         <div className="flex items-center gap-6">
-          <Link href="/login" className="text-sm font-medium text-texts hover:text-textp transition-colors">
-            Log In
-          </Link>
-          <Link href="/signup" className="text-sm font-medium bg-accent text-base px-4 py-2 rounded-md hover:opacity-80 transition-opacity">
-            Deploy Now
-          </Link>
+          {user ? (
+            <Link href="/dashboard" className="text-sm font-medium bg-accent text-base px-5 py-2.5 rounded-md hover:opacity-80 transition-opacity">
+              Go to Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link href="/login" className="text-sm font-medium text-texts hover:text-textp transition-colors">
+                Log In
+              </Link>
+              <Link href="/signup" className="text-sm font-medium bg-accent text-base px-4 py-2 rounded-md hover:opacity-80 transition-opacity">
+                Deploy Now
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
@@ -43,9 +55,15 @@ export default function LandingPage() {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <Link href="/signup" className="px-8 py-3.5 rounded-md bg-accent text-base font-semibold hover:opacity-80 transition-opacity flex items-center justify-center gap-2">
-            Start Monitoring Free
-          </Link>
+          {user ? (
+            <Link href="/dashboard" className="px-8 py-3.5 rounded-md bg-accent text-base font-semibold hover:opacity-80 transition-opacity flex items-center justify-center gap-2">
+              Go to Dashboard
+            </Link>
+          ) : (
+            <Link href="/signup" className="px-8 py-3.5 rounded-md bg-accent text-base font-semibold hover:opacity-80 transition-opacity flex items-center justify-center gap-2">
+              Start Monitoring Free
+            </Link>
+          )}
           <Link href="#features" className="px-8 py-3.5 rounded-md border border-borderg bg-card hover:bg-hover transition-colors font-semibold flex items-center justify-center text-textp">
             Explore Documentation
           </Link>

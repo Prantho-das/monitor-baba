@@ -5,8 +5,10 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const router = useRouter();
   const { loading: authLoading } = useAuth(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,7 +29,7 @@ export default function LoginPage() {
       if (error) {
         setErrorMsg(error.message);
       } else {
-        window.location.href = '/dashboard';
+        router.push('/dashboard');
       }
     } catch (err: any) {
       setErrorMsg('An unexpected error occurred. Please try again.');
