@@ -226,7 +226,7 @@ export default function ServerDetailPage({
         </div>
 
         {/* Gauges section */}
-        <AdBanner dataAdSlot="top-slot-12345" />
+        <AdBanner dataAdSlot="8857627823" />
         <div style={styles.sectionTitle}>
           <h3>Real-time Utilization</h3>
         </div>
@@ -249,7 +249,7 @@ export default function ServerDetailPage({
         </div>
 
         {/* Historical Charts */}
-        <AdBanner dataAdSlot="middle-slot-12345" />
+        <AdBanner dataAdSlot="7356843899" />
         <div style={styles.sectionTitle}>
           <h3>Telemetry History (Last 30 cycles)</h3>
         </div>

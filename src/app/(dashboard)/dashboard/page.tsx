@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import TopBar from '@/components/TopBar';
 import ServerCard from '@/components/ServerCard';
+import AdBanner from '@/components/AdBanner';
 import Link from 'next/link';
 import { Monitor, CheckCircle2, AlertTriangle, XCircle, TerminalSquare } from 'lucide-react';
 
@@ -160,6 +161,8 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
+
+            <AdBanner dataAdSlot="2862769964" />
 
             {/* Split dashboard into Server Grid and Recent Alerts */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">

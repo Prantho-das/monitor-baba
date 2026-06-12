@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase/client';
 import TopBar from '@/components/TopBar';
 import ServerCard from '@/components/ServerCard';
 import AddServerModal from '@/components/AddServerModal';
+import AdBanner from '@/components/AdBanner';
 import { Search, Plus, TerminalSquare } from 'lucide-react';
 
 interface Server {
@@ -112,6 +113,8 @@ export default function ServersPage() {
             <Plus size={16} /> Add Server
           </button>
         </div>
+
+        <AdBanner dataAdSlot="8579301933" />
 
         {loading ? (
           <div className="text-[15px] font-medium text-texts animate-pulse py-10">
