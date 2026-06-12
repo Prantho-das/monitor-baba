@@ -33,6 +33,17 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/logo.png" />
         {/* Google AdSense Script */}
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8440441791918870" crossOrigin="anonymous"></script>
+        {/* Theme Initialization Script */}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              try {
+                var theme = localStorage.getItem('theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+              } catch (e) {}
+            })();
+          `
+        }} />
       </head>
       <body>
         <ServiceWorkerRegister />
