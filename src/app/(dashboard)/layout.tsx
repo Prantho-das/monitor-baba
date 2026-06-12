@@ -14,7 +14,7 @@ export default function DashboardLayout({
   if (loading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-base">
-        <div className="text-lg text-accent animate-[pulse-glow_1.5s_infinite_ease-in-out]">
+        <div className="text-[15px] font-medium text-texts animate-pulse">
           Initialising Dashboard...
         </div>
       </div>
@@ -24,7 +24,7 @@ export default function DashboardLayout({
   return (
     <div className="flex min-h-screen bg-base text-textp">
       <Sidebar />
-      <main className="flex-1 ml-64 min-h-screen relative overflow-x-hidden flex flex-col">
+      <main className="flex-1 md:ml-64 mb-16 md:mb-0 min-h-screen relative overflow-x-hidden flex flex-col">
         {children}
       </main>
     </div>

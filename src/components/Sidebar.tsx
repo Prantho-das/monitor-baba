@@ -18,46 +18,46 @@ export default function Sidebar() {
   ];
 
   if (user?.app_metadata?.is_super_admin === true) {
-    menuItems.push({ name: 'Admin Panel', path: '/admin', icon: <ShieldAlert size={18} /> });
+    menuItems.push({ name: 'Admin', path: '/admin', icon: <ShieldAlert size={18} /> });
   }
 
   return (
-    <aside className="fixed left-0 top-0 w-64 h-screen bg-card border-r border-borderg flex flex-col z-[100] transition-colors duration-200">
-      <div className="p-6 flex items-center gap-3 border-b border-borderg h-[70px]">
+    <aside className="fixed bottom-0 md:top-0 left-0 w-full md:w-64 h-[65px] md:h-screen bg-card border-t md:border-t-0 md:border-r border-borderg flex flex-row md:flex-col z-[100] transition-colors duration-200">
+      <div className="hidden md:flex p-6 items-center gap-3 border-b border-borderg h-[70px] flex-shrink-0">
         <div className="w-8 h-8 relative rounded overflow-hidden shadow-sm border border-borderg bg-hover flex-shrink-0">
           <Image src="/logo.png" alt="Logo" fill className="object-cover" />
         </div>
         <span className="font-semibold text-[16px] text-textp tracking-tight truncate">Monitor-Baba</span>
       </div>
 
-      <nav className="flex-1 px-4 py-6 flex flex-col gap-1 overflow-y-auto">
+      <nav className="flex-1 px-1 md:px-4 py-1.5 md:py-6 flex flex-row md:flex-col justify-around md:justify-start items-center md:items-stretch gap-1 overflow-x-auto md:overflow-y-auto hide-scrollbar">
         {menuItems.map((item) => {
           const isActive = pathname === item.path || pathname.startsWith(item.path + '/');
           return (
             <Link
               key={item.path}
               href={item.path}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-[13px] font-medium transition-colors duration-200 ${
+              className={`flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-2 md:px-3 py-1.5 md:py-2.5 rounded-md transition-colors duration-200 min-w-[60px] md:min-w-0 ${
                 isActive 
-                  ? 'bg-hover text-textp font-semibold' 
+                  ? 'text-textp font-semibold md:bg-hover' 
                   : 'text-texts hover:text-textp hover:bg-hover'
               }`}
             >
               <span className={isActive ? 'text-textp' : 'text-textm'}>{item.icon}</span>
-              <span>{item.name}</span>
+              <span className="text-[10px] md:text-[13px] tracking-tight">{item.name}</span>
             </Link>
           );
         })}
         <button 
           onClick={signOut} 
-          className="lg:hidden flex items-center gap-3 px-3 py-2.5 rounded-md text-[13px] font-medium text-texts hover:text-textp hover:bg-hover transition-colors mt-1"
+          className="md:hidden flex flex-col items-center justify-center gap-1 px-2 py-1.5 rounded-md text-texts hover:text-textp hover:bg-hover transition-colors min-w-[60px]"
         >
           <LogOut size={18} className="text-textm" />
-          <span>Sign Out</span>
+          <span className="text-[10px] tracking-tight">Log Out</span>
         </button>
       </nav>
 
-      <div className="p-4 border-t border-borderg">
+      <div className="hidden md:block p-4 border-t border-borderg flex-shrink-0">
         <button 
           onClick={signOut} 
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-[13px] font-medium text-texts hover:text-textp hover:bg-hover transition-colors"
