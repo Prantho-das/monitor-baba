@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { LayoutDashboard, Server, Bell, Settings, ShieldAlert, LogOut, Hexagon } from 'lucide-react';
+import { LayoutDashboard, Server, Bell, Settings, ShieldAlert, LogOut } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -23,8 +24,10 @@ export default function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 w-64 h-screen bg-card border-r border-borderg flex flex-col z-[100] transition-colors duration-200">
       <div className="p-6 flex items-center gap-3 border-b border-borderg h-[70px]">
-        <Hexagon size={24} className="text-online" />
-        <span className="font-semibold text-lg text-textp tracking-tight">Monitor-Baba</span>
+        <div className="w-8 h-8 relative rounded overflow-hidden shadow-sm border border-borderg bg-hover flex-shrink-0">
+          <Image src="/logo.png" alt="Logo" fill className="object-cover" />
+        </div>
+        <span className="font-semibold text-[16px] text-textp tracking-tight truncate">Monitor-Baba</span>
       </div>
 
       <nav className="flex-1 px-4 py-6 flex flex-col gap-1 overflow-y-auto">

@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Hexagon, Activity, Bell, LayoutDashboard } from 'lucide-react';
+import Image from 'next/image';
+import { Activity, Bell, LayoutDashboard } from 'lucide-react';
 
 export default function LandingPage() {
   return (
@@ -10,7 +11,9 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="flex justify-between items-center px-6 py-4 md:px-12 relative z-10 border-b border-white/5 bg-black/50 backdrop-blur-md">
         <div className="flex items-center gap-3">
-          <Hexagon size={28} className="text-white" />
+          <div className="w-8 h-8 relative rounded overflow-hidden">
+            <Image src="/logo.png" alt="Neural Network Systems" fill className="object-cover" />
+          </div>
           <span className="text-xl font-bold tracking-tight">Monitor-Baba</span>
         </div>
         <div className="flex items-center gap-6">
@@ -68,7 +71,10 @@ export default function LandingPage() {
         </div>
       </main>
 
-      <footer className="relative z-10 text-center py-10 text-xs text-zinc-600 border-t border-white/5 mt-20">
+      <footer className="relative z-10 text-center py-10 text-xs text-zinc-600 border-t border-white/5 mt-20 flex flex-col items-center gap-4">
+        <div className="w-6 h-6 relative rounded opacity-50 grayscale">
+          <Image src="/logo.png" alt="Neural Network Systems" fill className="object-cover" />
+        </div>
         <p>© 2026 Monitor-Baba Inc. All rights reserved.</p>
       </footer>
     </div>
