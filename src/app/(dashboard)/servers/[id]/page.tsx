@@ -9,6 +9,7 @@ import MetricGauge from '@/components/MetricGauge';
 import MetricChart from '@/components/MetricChart';
 import AgentInstaller from '@/components/AgentInstaller';
 import AdBanner from '@/components/AdBanner';
+import PeakHourChart from '@/components/PeakHourChart';
 
 interface Server {
   id: string;
@@ -132,13 +133,61 @@ export default function ServerDetailPage({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'online':
-        return 'var(--color-online)';
+        return 'rgb(var(--color-online))';
       case 'warning':
-        return 'var(--color-warning)';
+        return 'rgb(var(--color-warning))';
       case 'offline':
       default:
-        return 'var(--text-muted)';
+        return 'rgb(var(--color-critical))';
     }
+  };
+
+  const getUptimePercentage = (points: MetricPoint[], currentStatus: string) => {
+    if (!points || points.length === 0) {
+      return currentStatus === 'offline' ? 0 : 100;
+    }
+    if (points.length < 2) {
+      return currentStatus === 'offline' ? 0 : 100;
+    }
+
+    const sorted = [...points].sort((a, b) => 
+      new Date(a.recorded_at).getTime() - new Date(b.recorded_at).getTime()
+    );
+
+    const times = sorted.map(p => new Date(p.recorded_at).getTime());
+    
+    const diffs: number[] = [];
+    for (let i = 1; i < times.length; i++) {
+      diffs.push(times[i] - times[i - 1]);
+    }
+    
+    diffs.sort((a, b) => a - b);
+    const medianInterval = diffs[Math.floor(diffs.length / 2)] || 60000;
+    const threshold = medianInterval * 1.75;
+    
+    let totalDowntime = 0;
+    
+    for (let i = 1; i < times.length; i++) {
+      const gap = times[i] - times[i - 1];
+      if (gap > threshold) {
+        totalDowntime += (gap - medianInterval);
+      }
+    }
+    
+    const lastTime = times[times.length - 1];
+    const now = Date.now();
+    const currentGap = now - lastTime;
+    if (currentGap > threshold) {
+      totalDowntime += (currentGap - medianInterval);
+    }
+    
+    const oldestTime = times[0];
+    const totalTimeRange = now - oldestTime;
+    
+    if (totalTimeRange <= 0) return 100;
+    
+    const uptimePercent = ((totalTimeRange - totalDowntime) / totalTimeRange) * 100;
+    return Math.max(0, Math.min(100, uptimePercent));
   };
 
   const formatUptime = (seconds: number) => {
@@ -172,6 +221,8 @@ export default function ServerDetailPage({
     try { parsedServices = JSON.parse(parsedServices); } catch(e) {}
   }
 
+  const uptimeVal = getUptimePercentage(metrics, server.status);
+
   return (
     <>
       <TopBar title={`Server: ${server.name}`} />
@@ -204,6 +255,16 @@ export default function ServerDetailPage({
                 {server.status}
               </span>
             </div>
+          </div>
+          <div style={styles.specItem}>
+            <span style={styles.specLabel}>Uptime % (Last 500)</span>
+            <span style={{ 
+              fontSize: '14px',
+              fontWeight: '700', 
+              color: uptimeVal >= 99 ? 'rgb(var(--color-online))' : uptimeVal >= 95 ? 'rgb(var(--color-warning))' : 'rgb(var(--color-critical))' 
+            }}>
+              {uptimeVal.toFixed(2)}%
+            </span>
           </div>
           <div style={styles.specItem}>
             <span style={styles.specLabel}>IP Address</span>
@@ -255,36 +316,38 @@ export default function ServerDetailPage({
         </div>
         <div style={styles.chartsGrid}>
           <MetricChart
-            data={metrics}
+            data={metrics.slice(0, 30)}
             metricKey="cpu_percent"
             label="CPU Utilization Trend"
             color="var(--accent-cyan)"
           />
           <MetricChart
-            data={metrics}
+            data={metrics.slice(0, 30)}
             metricKey="ram_percent"
             label="Memory Footprint Trend"
             color="var(--accent-violet)"
           />
           <MetricChart
-            data={metrics}
+            data={metrics.slice(0, 30)}
             metricKey="disk_percent"
             label="Disk Storage Trend"
             color="var(--color-warning)"
           />
           <MetricChart
-            data={metrics}
+            data={metrics.slice(0, 30)}
             metricKey="network_in_mb"
             label="Network Download (RX)"
             color="#34d399"
           />
           <MetricChart
-            data={metrics}
+            data={metrics.slice(0, 30)}
             metricKey="network_out_mb"
             label="Network Upload (TX)"
             color="#60a5fa"
           />
         </div>
+
+        <PeakHourChart data={metrics} />
 
         {/* Incident Timeline */}
         <div style={styles.sectionTitle}>
@@ -363,9 +426,9 @@ export default function ServerDetailPage({
                 </div>
                 <div style={styles.macBody}>
                   {parsedServices.logs.sys ? parsedServices.logs.sys.split('\n').map((line: string, i: number) => {
-                    let color = 'var(--text-terminal-success)';
-                    if (line.toLowerCase().includes('error') || line.toLowerCase().includes('failed')) color = 'var(--text-terminal-error)';
-                    else if (line.toLowerCase().includes('warn')) color = 'var(--text-terminal-warn)';
+                    let color = '#10b981';
+                    if (line.toLowerCase().includes('error') || line.toLowerCase().includes('failed')) color = 'rgb(var(--color-critical))';
+                    else if (line.toLowerCase().includes('warn')) color = 'rgb(var(--color-warning))';
                     return <div key={i} style={{ color }}>{line}</div>;
                   }) : 'Waiting for logs...'}
                 </div>
@@ -384,9 +447,9 @@ export default function ServerDetailPage({
                 </div>
                 <div style={styles.macBody}>
                   {parsedServices.logs.nginx ? parsedServices.logs.nginx.split('\n').map((line: string, i: number) => {
-                    let color = 'var(--text-terminal-success)';
-                    if (line.toLowerCase().includes('error') || line.toLowerCase().includes('failed')) color = 'var(--text-terminal-error)';
-                    else if (line.toLowerCase().includes('warn')) color = 'var(--text-terminal-warn)';
+                    let color = '#10b981';
+                    if (line.toLowerCase().includes('error') || line.toLowerCase().includes('failed')) color = 'rgb(var(--color-critical))';
+                    else if (line.toLowerCase().includes('warn')) color = 'rgb(var(--color-warning))';
                     return <div key={i} style={{ color }}>{line}</div>;
                   }) : 'Waiting for logs...'}
                 </div>
@@ -520,20 +583,20 @@ const styles = {
     color: 'var(--text-primary)',
   },
   macTerminal: {
-    background: 'var(--bg-terminal)',
+    background: 'rgb(var(--bg-card))',
     borderRadius: '8px',
     overflow: 'hidden',
-    border: '1px solid var(--border-glass)',
-    boxShadow: 'var(--shadow-md)',
+    border: '1px solid rgb(var(--border-line))',
+    boxShadow: 'var(--shadow-sm)',
   },
   macHeader: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     padding: '10px 16px',
-    background: 'var(--bg-terminal-header)',
-    borderBottom: '1px solid var(--border-glass)',
-    color: 'var(--text-muted)',
+    background: 'rgb(var(--bg-hover))',
+    borderBottom: '1px solid rgb(var(--border-line))',
+    color: 'rgb(var(--text-secondary))',
     fontSize: '12px',
     fontFamily: 'monospace',
     position: 'relative' as const,
@@ -551,12 +614,13 @@ const styles = {
   },
   macBody: {
     padding: '16px',
-    color: 'var(--text-terminal-success)',
+    color: '#10b981',
     fontFamily: 'monospace',
     fontSize: '12px',
     overflowY: 'auto' as const,
     maxHeight: '300px',
     whiteSpace: 'pre-wrap' as const,
     lineHeight: '1.5',
+    background: 'rgb(var(--bg-main))',
   },
 };

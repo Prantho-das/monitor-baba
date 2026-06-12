@@ -14,7 +14,8 @@ export async function GET(request: Request) {
     const { data: alerts, error } = await supabase
       .from('alerts')
       .select('*, servers(name)')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(1000);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });

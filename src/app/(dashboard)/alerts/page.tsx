@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import TopBar from '@/components/TopBar';
 import { Check, CheckCircle2, AlertTriangle, Info, BellRing } from 'lucide-react';
+import AlertHeatmap from '@/components/AlertHeatmap';
 
 interface Alert {
   id: string;
@@ -142,52 +143,58 @@ export default function AlertsPage() {
           <div className="text-[15px] font-medium text-texts animate-pulse py-10">
             Querying alert history...
           </div>
-        ) : alerts.length === 0 ? (
-          <div className="glass-card flex flex-col items-center justify-center py-24 px-6 text-center border-dashed">
-            <CheckCircle2 size={48} className="text-texts mb-4 opacity-50" strokeWidth={1} />
-            <h4 className="text-[17px] font-semibold text-textp tracking-tight">No alerts logged yet</h4>
-            <p className="text-[14px] text-texts max-w-[400px] mx-auto mt-2 leading-relaxed">
-              All connected servers are performing normally. No threshold violations recorded.
-            </p>
-          </div>
         ) : (
-          <div className="flex flex-col gap-3">
-            {alerts.map((alert) => (
-              <div
-                key={alert.id}
-                className={`glass-card p-5 flex flex-col gap-3 transition-all duration-200 ${alert.is_read ? 'opacity-60 hover:opacity-100' : 'border-l-2 border-l-borderg shadow-sm'}`}
-                style={{
-                  borderLeftColor: alert.is_read ? 'var(--border-line)' : `var(--color-${alert.severity === 'critical' ? 'critical' : alert.severity === 'warning' ? 'warning' : 'online'})`
-                }}
-              >
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-2">
-                    {getSeverityIcon(alert.severity)}
-                    <strong className="text-[13px] font-semibold text-textp uppercase tracking-wider">
-                      {alert.servers?.name || 'Server'}
-                    </strong>
-                  </div>
-                  <span className="text-[11px] text-textm font-mono">
-                    {new Date(alert.created_at).toLocaleString()}
-                  </span>
-                </div>
+          <>
+            <AlertHeatmap alerts={alerts} />
 
-                <div className="flex justify-between items-end gap-4 ml-6">
-                  <p className="text-[14px] text-texts leading-relaxed m-0 flex-1">
-                    {alert.message}
-                  </p>
-                  {!alert.is_read && (
-                    <button
-                      onClick={() => handleMarkRead(alert.id)}
-                      className="text-[12px] font-medium text-texts hover:text-textp transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded bg-hover outline-none border border-borderg"
-                    >
-                      <Check size={14} /> Acknowledge
-                    </button>
-                  )}
-                </div>
+            {alerts.length === 0 ? (
+              <div className="glass-card flex flex-col items-center justify-center py-24 px-6 text-center border-dashed">
+                <CheckCircle2 size={48} className="text-texts mb-4 opacity-50" strokeWidth={1} />
+                <h4 className="text-[17px] font-semibold text-textp tracking-tight">No alerts logged yet</h4>
+                <p className="text-[14px] text-texts max-w-[400px] mx-auto mt-2 leading-relaxed">
+                  All connected servers are performing normally. No threshold violations recorded.
+                </p>
               </div>
-            ))}
-          </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {alerts.map((alert) => (
+                  <div
+                    key={alert.id}
+                    className={`glass-card p-5 flex flex-col gap-3 transition-all duration-200 ${alert.is_read ? 'opacity-60 hover:opacity-100' : 'border-l-2 border-l-borderg shadow-sm'}`}
+                    style={{
+                      borderLeftColor: alert.is_read ? 'var(--border-line)' : `var(--color-${alert.severity === 'critical' ? 'critical' : alert.severity === 'warning' ? 'warning' : 'online'})`
+                    }}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-2">
+                        {getSeverityIcon(alert.severity)}
+                        <strong className="text-[13px] font-semibold text-textp uppercase tracking-wider">
+                          {alert.servers?.name || 'Server'}
+                        </strong>
+                      </div>
+                      <span className="text-[11px] text-textm font-mono">
+                        {new Date(alert.created_at).toLocaleString()}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-end gap-4 ml-6">
+                      <p className="text-[14px] text-texts leading-relaxed m-0 flex-1">
+                        {alert.message}
+                      </p>
+                      {!alert.is_read && (
+                        <button
+                          onClick={() => handleMarkRead(alert.id)}
+                          className="text-[12px] font-medium text-texts hover:text-textp transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded bg-hover outline-none border border-borderg"
+                        >
+                          <Check size={14} /> Acknowledge
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
     </>

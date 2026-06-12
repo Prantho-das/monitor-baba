@@ -27,13 +27,13 @@ export async function GET(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: 'Server not found or access denied' }, { status: 404 });
     }
 
-    // Fetch latest 30 metrics records for rendering charts
+    // Fetch latest 500 metrics records for rendering charts and analytics
     const { data: metrics, error: metricsError } = await supabase
       .from('server_metrics')
       .select('*')
       .eq('server_id', id)
       .order('recorded_at', { ascending: false })
-      .limit(30);
+      .limit(500);
 
     return NextResponse.json({
       server,
