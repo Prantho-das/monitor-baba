@@ -89,63 +89,92 @@ export default function AdminDashboard() {
     }
   };
 
-  if (loading) return <div>Loading Admin Powers...</div>;
+  if (loading) return (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+      <div style={{ fontSize: '18px', color: 'var(--accent-cyan)', animation: 'pulse-glow 1.5s infinite ease-in-out' }}>
+        Loading Admin Powers...
+      </div>
+    </div>
+  );
 
   return (
-    <div>
-      <h1 style={{ fontSize: '24px', marginBottom: '24px' }}>System Overview</h1>
+    <div className="page-container" style={{ padding: '0', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
+        <h1 style={{ fontSize: '28px', fontWeight: 'bold', background: 'linear-gradient(to right, #60a5fa, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          Superadmin Command Center
+        </h1>
+        <span style={{ padding: '4px 12px', background: 'rgba(96, 165, 250, 0.1)', color: '#60a5fa', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold', border: '1px solid rgba(96, 165, 250, 0.2)' }}>LIVE</span>
+      </div>
       
       <div style={styles.grid}>
-        <div style={styles.card}>
+        <div className="glass-card" style={{ ...styles.card, borderTop: '4px solid #60a5fa' }}>
           <h3 style={styles.cardTitle}>Total Users</h3>
-          <p style={styles.cardValue}>{stats.totalUsers}</p>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
+            <p style={styles.cardValue}>{stats.totalUsers}</p>
+            <span style={{ color: '#60a5fa', fontSize: '14px', marginBottom: '6px' }}>Registered</span>
+          </div>
         </div>
-        <div style={styles.card}>
+        <div className="glass-card" style={{ ...styles.card, borderTop: '4px solid #a78bfa' }}>
           <h3 style={styles.cardTitle}>Total Servers</h3>
-          <p style={styles.cardValue}>{stats.totalServers}</p>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
+            <p style={styles.cardValue}>{stats.totalServers}</p>
+            <span style={{ color: '#a78bfa', fontSize: '14px', marginBottom: '6px' }}>Monitored</span>
+          </div>
         </div>
-        <div style={styles.card}>
+        <div className="glass-card" style={{ ...styles.card, borderTop: '4px solid var(--color-online)' }}>
           <h3 style={styles.cardTitle}>Online Servers</h3>
-          <p className="text-success" style={{ ...styles.cardValue, color: 'var(--color-online)' }}>
-            {stats.activeServers}
-          </p>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px' }}>
+            <p className="text-success" style={{ ...styles.cardValue, color: 'var(--color-online)' }}>
+              {stats.activeServers}
+            </p>
+            <span style={{ color: 'var(--color-online)', fontSize: '14px', marginBottom: '6px' }}>Active Now</span>
+          </div>
         </div>
       </div>
       
-      <div style={{ marginTop: '40px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
-        <div style={{ padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-          <h3>User Management</h3>
+      <div className="glass-card" style={{ marginTop: '40px', padding: '0', overflow: 'hidden' }}>
+        <div style={{ padding: '24px', borderBottom: '1px solid var(--border-glass)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3 style={{ fontSize: '18px', fontWeight: '600' }}>User Management</h3>
+          <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{users.length} Users Found</div>
         </div>
         
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
-              <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
-                <th style={styles.th}>Email</th>
+              <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
+                <th style={styles.th}>Email Address</th>
                 <th style={styles.th}>Joined Date</th>
-                <th style={styles.th}>Status</th>
-                <th style={styles.th}>Actions</th>
+                <th style={styles.th}>Account Status</th>
+                <th style={styles.th} align="right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {users.map(user => (
-                <tr key={user.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                  <td style={styles.td}>{user.email}</td>
-                  <td style={styles.td}>{new Date(user.created_at).toLocaleDateString()}</td>
+                <tr key={user.id} style={{ borderBottom: '1px solid var(--border-glass)', transition: 'background 0.2s' }}>
+                  <td style={styles.td}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-violet))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '14px' }}>
+                        {user.email.charAt(0).toUpperCase()}
+                      </div>
+                      <span style={{ fontWeight: '500' }}>{user.email}</span>
+                    </div>
+                  </td>
+                  <td style={{ ...styles.td, color: 'var(--text-muted)' }}>{new Date(user.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</td>
                   <td style={styles.td}>
                     {user.is_banned ? (
-                      <span style={{ color: 'var(--color-critical)', fontWeight: 'bold' }}>BANNED</span>
+                      <span style={{ color: 'var(--color-critical)', fontWeight: 'bold', background: 'rgba(239, 68, 68, 0.1)', padding: '4px 10px', borderRadius: '12px', fontSize: '12px' }}>BANNED</span>
                     ) : (
-                      <span style={{ color: 'var(--color-online)' }}>ACTIVE</span>
+                      <span style={{ color: 'var(--color-online)', fontWeight: '500', background: 'rgba(16, 185, 129, 0.1)', padding: '4px 10px', borderRadius: '12px', fontSize: '12px' }}>ACTIVE</span>
                     )}
                   </td>
-                  <td style={styles.td}>
+                  <td style={styles.td} align="right">
                     <button 
                       onClick={() => handleToggleBan(user.id, user.is_banned)}
                       disabled={processingId === user.id}
                       style={{
                         ...styles.actionBtn,
-                        background: user.is_banned ? 'rgba(255,255,255,0.1)' : 'var(--color-critical)'
+                        background: user.is_banned ? 'rgba(255,255,255,0.1)' : 'var(--color-critical)',
+                        opacity: processingId === user.id ? 0.5 : 1
                       }}
                     >
                       {processingId === user.id ? 'Processing...' : (user.is_banned ? 'Unban User' : 'Ban User')}
@@ -155,8 +184,8 @@ export default function AdminDashboard() {
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={4} style={{ padding: '20px', textAlign: 'center', color: '#888' }}>
-                    No users found.
+                  <td colSpan={4} style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                    No users found in the system.
                   </td>
                 </tr>
               )}
@@ -171,42 +200,49 @@ export default function AdminDashboard() {
 const styles = {
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
     gap: '24px',
   },
   card: {
-    background: 'rgba(255, 255, 255, 0.05)',
     padding: '24px',
-    borderRadius: '12px',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    justifyContent: 'space-between',
   },
   cardTitle: {
-    fontSize: '14px',
-    color: '#aaa',
+    fontSize: '13px',
+    color: 'var(--text-muted)',
     textTransform: 'uppercase' as const,
-    marginBottom: '12px',
+    fontWeight: '600',
+    letterSpacing: '1px',
+    marginBottom: '16px',
   },
   cardValue: {
-    fontSize: '32px',
-    fontWeight: 'bold',
+    fontSize: '42px',
+    fontWeight: '800',
+    lineHeight: '1',
   },
   th: {
-    padding: '16px',
-    fontSize: '14px',
-    color: '#888',
-    fontWeight: 'normal',
+    padding: '16px 24px',
+    fontSize: '12px',
+    color: 'var(--text-muted)',
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.5px',
+    fontWeight: '600',
   },
   td: {
-    padding: '16px',
+    padding: '16px 24px',
     fontSize: '14px',
   },
   actionBtn: {
     border: 'none',
     color: '#fff',
-    padding: '6px 12px',
-    borderRadius: '4px',
+    padding: '8px 16px',
+    borderRadius: '6px',
     cursor: 'pointer',
-    fontSize: '12px',
-    fontWeight: 'bold',
+    fontSize: '13px',
+    fontWeight: '600',
+    transition: 'all 0.2s',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
   }
 };

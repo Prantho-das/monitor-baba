@@ -6,7 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
 
   const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: '📊' },
@@ -14,6 +14,10 @@ export default function Sidebar() {
     { name: 'Alerts', path: '/alerts', icon: '🔔' },
     { name: 'Settings', path: '/settings', icon: '⚙️' },
   ];
+
+  if (user?.app_metadata?.is_super_admin === true) {
+    menuItems.push({ name: 'Admin Panel', path: '/admin', icon: '👑' });
+  }
 
   return (
     <aside className="dashboard-sidebar">
