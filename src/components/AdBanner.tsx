@@ -28,13 +28,13 @@ export default function AdBanner({
   }, []);
 
   return (
-    <div style={styles.adContainer}>
-      <span style={styles.adLabel}>Advertisement</span>
+    <div className="my-6 p-4 bg-hover border border-borderg border-dashed rounded-lg text-center min-h-[100px] flex flex-col items-center justify-center">
+      <span className="text-[10px] text-textm uppercase tracking-wider mb-2 font-semibold">Advertisement</span>
       <ins
         ref={adRef}
         className="adsbygoogle"
         style={{ display: 'block', width: '100%' }}
-        data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" // TODO: Replace with your actual publisher ID
+        data-ad-client="ca-pub-8440441791918870"
         data-ad-slot={dataAdSlot}
         data-ad-format={dataAdFormat}
         data-full-width-responsive={dataFullWidthResponsive.toString()}
@@ -42,26 +42,3 @@ export default function AdBanner({
     </div>
   );
 }
-
-const styles = {
-  adContainer: {
-    margin: '24px 0',
-    padding: '16px',
-    background: 'rgba(255, 255, 255, 0.02)',
-    border: '1px dashed var(--border-glass)',
-    borderRadius: '8px',
-    textAlign: 'center' as const,
-    minHeight: '100px',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  adLabel: {
-    fontSize: '10px',
-    color: 'var(--text-muted)',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '1px',
-    marginBottom: '8px',
-  },
-};
